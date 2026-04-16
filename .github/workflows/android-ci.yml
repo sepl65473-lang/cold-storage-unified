@@ -93,7 +93,7 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
       - name: Build release bundle (AAB)
-        run: ./gradlew bundleRelease
+        run: gradle bundleRelease
         working-directory: android
         env:
           KEYSTORE_PATH: keystore.jks

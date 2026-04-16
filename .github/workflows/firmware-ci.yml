@@ -22,7 +22,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Verify ESP-IDF environment
-        run: idf.py --version
+        run: |
+          . ${IDF_PATH}/export.sh
+          idf.py --version
         working-directory: firmware
 
       - name: Build firmware (target esp32)
