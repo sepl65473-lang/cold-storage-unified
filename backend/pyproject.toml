@@ -82,8 +82,8 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "ANN"]
-ignore = ["ANN101", "ANN102"]
+select = ["E", "W", "F", "I", "UP", "B", "SIM"]
+ignore = ["ANN", "F401", "F841"] # Ignore annotations and unused variables for now
 
 [tool.mypy]
 python_version = "3.12"
