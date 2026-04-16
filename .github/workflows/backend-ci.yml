@@ -3,10 +3,8 @@ name: Backend CI
 on:
   push:
     branches: [main, develop]
-    paths: ["backend/**"]
   pull_request:
     branches: [main, develop]
-    paths: ["backend/**"]
 
 env:
   PYTHON_VERSION: "3.12"

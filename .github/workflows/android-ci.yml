@@ -3,10 +3,8 @@ name: Android CI
 on:
   push:
     branches: [main, develop]
-    paths: ["android/**"]
   pull_request:
     branches: [main, develop]
-    paths: ["android/**"]
 
 jobs:
   lint:
