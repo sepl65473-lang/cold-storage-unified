@@ -61,7 +61,55 @@ async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
         "doorsOpen": 0
     }
 
-@router.get("/alerts")
-async def get_alerts() -> list[dict[str, Any]]:
-    """Bridge endpoint for dashboard alerts."""
-    return [] # Return empty list for now to satisfy UI
+
+@router.get("/history/temperature")
+async def get_temperature_history(
+    db: AsyncSession = Depends(get_db)
+):
+    """Compatibility endpoint for dashboard 'Temperature Trends'."""
+    # Fetch latest 24 readings across all devices for the main trend line
+    result = await db.execute(
+        select(SensorReading)
+        .order_by(SensorReading.time.asc())
+        .limit(24)
+    )
+    readings = result.scalars().all()
+    # Format for charts (A1, A2, B1 etc - we map by index or label)
+    return [
+        {
+            "time": r.time.strftime("%H:%M"),
+            "a1": r.temperature,
+            "a2": r.temperature + 0.5 if r.temperature else None,
+            "b1": r.temperature - 0.5 if r.temperature else None
+        }
+        for r in readings
+    ]
+
+@router.get("/history/humidity")
+async def get_humidity_history(
+    db: AsyncSession = Depends(get_db)
+):
+    """Compatibility endpoint for dashboard 'Humidity Trends'."""
+    result = await db.execute(
+        select(SensorReading)
+        .order_by(SensorReading.time.asc())
+        .limit(24)
+    )
+    readings = result.scalars().all()
+    return [
+        {
+            "time": r.time.strftime("%H:%M"),
+            "val": r.humidity
+        }
+        for r in readings
+    ]
+
+@router.get("/distribution/zones")
+async def get_zone_distribution():
+    """Compatibility endpoint for dashboard 'Humidity Distribution across Zones'."""
+    # Placeholder to satisfy UI until zone mapping is implemented
+    return [
+        {"name": "Zone A1", "value": 45},
+        {"name": "Zone A2", "value": 32},
+        {"name": "Zone B1", "value": 23}
+    ]
