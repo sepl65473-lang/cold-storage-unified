@@ -44,11 +44,36 @@ async def ingest_sensor_data(
             detail="Invalid IoT Ingest Token"
         )
     
-    # Verify device exists
+    # ─── Auto-Registration Logic ──────────────────────────────────────────────
     device_result = await db.execute(select(Device).where(Device.id == payload.device_id))
     device = device_result.scalar_one_or_none()
+    
     if not device:
-        raise HTTPException(status_code=404, detail="Device not found")
+        from app.models.user import Organization
+        # 1. Ensure Demo Organization exists
+        org_result = await db.execute(select(Organization).where(Organization.name == "Demo Organization"))
+        org = org_result.scalar_one_or_none()
+        
+        if not org:
+            org = Organization(
+                id=uuid.uuid4(),
+                name="Demo Organization",
+                region="us-east-1"
+            )
+            db.add(org)
+            await db.flush()
+        
+        # 2. Auto-register Device
+        device = Device(
+            id=payload.device_id,
+            organization_id=org.id,
+            name=f"IoT Node: {str(payload.device_id)[:8]}",
+            status="online"
+        )
+        db.add(device)
+        await db.commit()
+        await db.refresh(device)
+    # ──────────────────────────────────────────────────────────────────────────
 
     # Create reading
     reading = SensorReading(
