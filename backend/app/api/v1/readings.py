@@ -30,6 +30,7 @@ async def _verify_device_ownership(device_id: uuid.UUID, org_id: uuid.UUID, db: 
 
 @router.post("/ingest", status_code=status.HTTP_201_CREATED)
 async def ingest_sensor_data(
+    request: Request,
     payload: SensorReadingIngest,
     x_api_key: str = Header(...),
     db: AsyncSession = Depends(get_db),
@@ -38,6 +39,10 @@ async def ingest_sensor_data(
     HTTP POST endpoint for IoT devices to push telemetry data.
     Requires X-API-KEY internal header.
     """
+    import logging
+    logger = logging.getLogger("app.readings")
+    raw_body = await request.body()
+    logger.info(f"RAW TELEMETRY RECEIVED: {raw_body.decode()}")
     if x_api_key != settings.IOT_INGEST_TOKEN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 

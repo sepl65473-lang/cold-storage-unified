@@ -26,6 +26,12 @@ class Settings(BaseSettings):
         if isinstance(values, dict) and "ENVIRONMENT" in values:
             aliases = {"prod": "production", "dev": "development"}
             values["ENVIRONMENT"] = aliases.get(str(values["ENVIRONMENT"]), values["ENVIRONMENT"])
+        
+        if isinstance(values, dict) and "DATABASE_URL" in values:
+            url = str(values["DATABASE_URL"])
+            if url.startswith("postgresql://") and "+asyncpg" not in url:
+                values["DATABASE_URL"] = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        
         return values
 
     # ── Database ──────────────────────────────────────────────────────────────
