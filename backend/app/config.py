@@ -3,6 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,6 +14,19 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "test", "production"] = "development"
     SECRET_KEY: str = "change-me-in-production"
     DEBUG: bool = False
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_env(cls, values: dict) -> dict:
+        """Normalize 'prod' -> 'production', 'dev' -> 'development'.
+        
+        AWS ECS Task Definition has ENVIRONMENT=prod set.
+        The Literal type only accepts 'production', so we normalize here.
+        """
+        if isinstance(values, dict) and "ENVIRONMENT" in values:
+            aliases = {"prod": "production", "dev": "development"}
+            values["ENVIRONMENT"] = aliases.get(str(values["ENVIRONMENT"]), values["ENVIRONMENT"])
+        return values
 
     # ── Database ──────────────────────────────────────────────────────────────
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres_dev_password@db:5432/cold_storage_dev"
