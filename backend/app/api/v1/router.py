@@ -25,3 +25,9 @@ api_router.include_router(readings_router, prefix="/readings", tags=["Sensor Rea
 api_router.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 api_router.include_router(admin_users_router, prefix="/admin/users", tags=["Admin: Users"])
 api_router.include_router(admin_ota_router, prefix="/admin/ota", tags=["Admin: OTA Updates"])
+
+
+@api_router.get("/health", tags=["Health"])
+async def health_check():
+      return {"status": "ok"}
+  
