@@ -32,7 +32,7 @@ async def _verify_device_ownership(device_id: uuid.UUID, org_id: uuid.UUID, db: 
 async def ingest_sensor_data(
     request: Request,
     payload: SensorReadingIngest,
-    x_api_key: str = Header(...),
+    x_api_key: str = Header(..., alias="X-API-KEY"),
     db: AsyncSession = Depends(get_db),
 ):
     """
