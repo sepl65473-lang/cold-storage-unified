@@ -88,8 +88,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await _ensure_seed_data()
         
     except Exception as exc:
-        logger.error("Database initialization failed at startup", error=str(exc))
-        raise
+        logger.error("Database initialization failed at startup (Container will stay alive for retries)", error=str(exc))
+        # We do NOT raise here to allow the container to stay alive, pass health checks, and retry 
+        # connection during subsequent requests.
 
     # Start MQTT Bridge (dev mode — subscribes to Mosquitto and routes to Celery)
     mqtt_bridge = None
