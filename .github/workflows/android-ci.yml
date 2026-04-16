@@ -75,11 +75,11 @@ jobs:
           retention-days: 14
 
   build_release:
-    if: false  # Emergency bypass
+    if: false && github.ref == 'refs/heads/main'  # Emergency bypass
     name: Build Release AAB (main only)
     runs-on: ubuntu-latest
     needs: unit_test
-    if: github.ref == 'refs/heads/main'
+
     environment: production
     steps:
       - uses: actions/checkout@v4
