@@ -132,6 +132,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
     cache_policy_id  = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -141,6 +142,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
     cache_policy_id  = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -150,6 +152,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
     cache_policy_id  = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -174,6 +177,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
     cache_policy_id  = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -183,6 +187,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
     cache_policy_id  = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     viewer_protocol_policy = "redirect-to-https"
   }
 
