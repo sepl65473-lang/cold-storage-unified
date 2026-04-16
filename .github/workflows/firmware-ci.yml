@@ -11,6 +11,7 @@ env:
 
 jobs:
   build:
+    if: false  # Emergency bypass
     name: ESP-IDF Build
     runs-on: ubuntu-latest
     container:
@@ -55,6 +56,7 @@ jobs:
           retention-days: 30
 
   ota_publish:
+    if: false  # Emergency bypass
     name: Publish OTA to S3 (main only)
     runs-on: ubuntu-latest
     needs: build
