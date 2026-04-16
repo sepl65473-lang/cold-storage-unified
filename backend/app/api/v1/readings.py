@@ -46,11 +46,14 @@ async def ingest_sensor_data(
     logger.info(f"RAW TELEMETRY RECEIVED: {raw_body.decode()}")
 
     # ─── Auth Verification ────────────────────────────────────────────────────
-    # Manual header check to avoid FastAPI's dash-case/snake-case confusion with ESP32 headers
-    # ESP32 might send X-API-KEY or x-api-key; request.headers is case-insensitive.
+    # Manual header check (case-insensitive) + Query Param fallback for hardware resiliency
     h_api_key = request.headers.get("X-API-KEY") or request.headers.get("x-api-key")
-    if h_api_key != settings.IOT_INGEST_TOKEN:
-        logger.warning(f"AUTH FAILED: Header={h_api_key} Expected={settings.IOT_INGEST_TOKEN}")
+    q_api_key = request.query_params.get("api_key")
+    
+    current_key = h_api_key or q_api_key
+    
+    if current_key != settings.IOT_INGEST_TOKEN:
+        logger.warning(f"AUTH FAILED: Header={h_api_key} Query={q_api_key} Expected={settings.IOT_INGEST_TOKEN}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
             detail="Invalid IoT Ingest Token"
