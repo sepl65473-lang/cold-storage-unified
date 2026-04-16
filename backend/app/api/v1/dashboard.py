@@ -48,13 +48,13 @@ async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     total_res = await db.execute(select(func.count(Device.id)))
     total = total_res.scalar() or 0
     
-    # Calculate avg temp across all latest readings
-    avg_res = await db.execute(select(func.avg(SensorReading.temperature)))
-    avg_temp = avg_res.scalar() or 0.0
+    # Calculate avg humidity across all latest readings
+    avg_hum_res = await db.execute(select(func.avg(SensorReading.humidity)))
+    avg_humidity = avg_hum_res.scalar() or 0.0
     
     return {
         "avgTemp": round(float(avg_temp), 1),
-        "avgHumidity": 65, # Placeholder or calculated
+        "avgHumidity": round(float(avg_humidity), 1),
         "activeChambers": total,
         "totalChambers": total,
         "activeAlerts": 0,
