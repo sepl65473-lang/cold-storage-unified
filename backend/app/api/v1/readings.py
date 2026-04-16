@@ -29,6 +29,18 @@ async def _verify_device_ownership(device_id: uuid.UUID, org_id: uuid.UUID, db: 
 
 
 
+
+@router.get("/debug-headers")
+async def debug_headers(request: Request):
+    """Debug endpoint to verify CloudFront header forwarding."""
+    return {
+        "headers": dict(request.headers),
+        "query_params": dict(request.query_params),
+        "url": str(request.url),
+        "client": request.client.host if request.client else "unknown"
+    }
+
+
 @router.post("/ingest", status_code=status.HTTP_201_CREATED)
 @router.post("/ingest/", status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def ingest_sensor_data(
@@ -43,7 +55,13 @@ async def ingest_sensor_data(
     import logging
     logger = logging.getLogger("app.readings")
     raw_body = await request.body()
-    logger.info(f"RAW TELEMETRY RECEIVED: {raw_body.decode()}")
+    logger.info(
+        "TELEMETRY INGESTION ATTEMPT",
+        path=str(request.url.path),
+        method=request.method,
+        user_agent=request.headers.get("user-agent"),
+        raw_body_preview=raw_body.decode()[:100] if raw_body else None
+    )
 
     # ─── Auth Verification ────────────────────────────────────────────────────
     # Manual header check (case-insensitive) + Query Param fallback for hardware resiliency

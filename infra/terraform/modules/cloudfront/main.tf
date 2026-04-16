@@ -25,6 +25,10 @@ data "aws_cloudfront_cache_policy" "disabled" {
   name = "Managed-CachingDisabled"
 }
 
+data "aws_cloudfront_origin_request_policy" "all_viewer" {
+  name = "Managed-AllViewerExceptHostHeader"
+}
+
 # ACM Certificate MUST be in us-east-1 for CloudFront
 resource "aws_acm_certificate" "cert" {
   domain_name       = var.domain_name
@@ -112,13 +116,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   # Specific behavior for IoT Ingestion to allow HTTP (non-secure)
   ordered_cache_behavior {
-    path_pattern     = "/api/v1/readings/ingest"
+    path_pattern     = "/api/v1/readings/ingest*"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "ALB-Backend"
 
-    cache_policy_id = data.aws_cloudfront_cache_policy.disabled.id
-    viewer_protocol_policy = "allow-all" # Allows both HTTP and HTTPS
+    cache_policy_id          = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    viewer_protocol_policy   = "allow-all" # Allows both HTTP and HTTPS
   }
 
   ordered_cache_behavior {
