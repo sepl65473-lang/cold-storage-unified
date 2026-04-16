@@ -1,0 +1,75 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Web
+node_modules/
+.next/
+dist/
+.parcel-cache/
+*.local
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/google-services.json
+*.apk
+*.aab
+
+# Firmware / ESP-IDF
+firmware/build/
+firmware/sdkconfig
+firmware/dependencies.lock
+firmware/managed_components/
+firmware/certs/*.pem
+firmware/certs/*.key
+firmware/certs/*.crt
+firmware/certs/*.der
+
+# Terraform
+infra/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.backup
+infra/**/*.tfvars
+!infra/**/*.tfvars.example
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — NEVER commit real credentials
+*.pem
+*.key
+*.p12
+secrets/
+
+# Large binaries 
+terraform.exe
+AWSCLIV2.msi
+terraform.zip
+*.exe
+*.msi
+*.zip
+.terraform/
+**/ .terraform/
+**/.terraform/
+

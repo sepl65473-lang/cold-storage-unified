@@ -1,0 +1,581 @@
+﻿cmd : INFO  [alembic.ru
+ntime.migration] 
+Context impl 
+PostgresqlImpl.
+At line:1 char:1
++ cmd /c ".venv\Scripts
+\python.exe -m alembic 
+upgrade head" > 
+alembic_o ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (INFO  [alembi   
+ c....PostgresqlImp    
+l.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+INFO  [alembic.runtime.
+migration] Will assume 
+transactional DDL.
+INFO  [alembic.runtime.
+migration] Running 
+upgrade 0001_initial 
+-> 7ac84b9e79da, Add 
+OTA and Firmware models
+Traceback (most recent 
+call last):
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 550, in 
+_prepare_and_execute
+    self._rows = 
+deque(await prepared_st
+mt.fetch(*parameters))
+                       
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\asyncpg\prepared_
+stmt.py", line 177, in 
+fetch
+    data = await self._
+_bind_execute(args, 0, 
+timeout)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\asyncpg\prepared_
+stmt.py", line 268, in 
+__bind_execute
+    data, status, _ = 
+await 
+self.__do_execute(
+                      ^
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\asyncpg\prepared_
+stmt.py", line 257, in 
+__do_execute
+    return await 
+executor(protocol)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^
+  File "asyncpg/protoco
+l/protocol.pyx", line 
+205, in bind_execute
+    return await waiter
+asyncpg.exceptions.Feat
+ureNotSupportedError: 
+cannot alter type of a 
+column used by a view 
+or rule
+DETAIL:  rule _RETURN 
+on view _timescaledb_in
+ternal._partial_view_2 
+depends on column 
+"temperature"
+
+The above exception 
+was the direct cause 
+of the following 
+exception:
+
+Traceback (most recent 
+call last):
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1967, 
+in _exec_single_context
+    self.dialect.do_exe
+cute(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\default.py", line 
+952, in do_execute
+    cursor.execute(stat
+ement, parameters)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 585, in 
+execute
+    self._adapt_connect
+ion.await_(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\util\_
+concurrency_py3k.py", 
+line 132, in await_only
+    return current.pare
+nt.switch(awaitable)  
+# type: ignore[no-any-r
+eturn,attr-defined] # 
+noqa: E501
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\util\_
+concurrency_py3k.py", 
+line 196, in 
+greenlet_spawn
+    value = await 
+result
+            
+^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 563, in 
+_prepare_and_execute
+    self._handle_except
+ion(error)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 513, in 
+_handle_exception
+    self._adapt_connect
+ion._handle_exception(e
+rror)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 797, in 
+_handle_exception
+    raise 
+translated_error from 
+error
+sqlalchemy.dialects.pos
+tgresql.asyncpg.AsyncAd
+apt_asyncpg_dbapi.Error
+: <class 'asyncpg.excep
+tions.FeatureNotSupport
+edError'>: cannot 
+alter type of a column 
+used by a view or rule
+DETAIL:  rule _RETURN 
+on view _timescaledb_in
+ternal._partial_view_2 
+depends on column 
+"temperature"
+
+The above exception 
+was the direct cause 
+of the following 
+exception:
+
+Traceback (most recent 
+call last):
+  File "<frozen 
+runpy>", line 198, in 
+_run_module_as_main
+  File "<frozen 
+runpy>", line 88, in 
+_run_code
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\__main__.
+py", line 4, in 
+<module>
+    
+main(prog="alembic")
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\config.py
+", line 1047, in main
+    CommandLine(prog=pr
+og).main(argv=argv)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\config.py
+", line 1037, in main
+    self.run_cmd(cfg, 
+options)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\config.py
+", line 971, in run_cmd
+    fn(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\command.p
+y", line 483, in 
+upgrade
+    script.run_env()
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\script\ba
+se.py", line 545, in 
+run_env
+    util.load_python_fi
+le(self.dir, "env.py")
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\util\pyfi
+les.py", line 116, in 
+load_python_file
+    module = load_modul
+e_py(module_id, path)
+             ^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\util\pyfi
+les.py", line 136, in 
+load_module_py
+    spec.loader.exec_mo
+dule(module)  # type: 
+ignore
+    ^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
+  File "<frozen importl
+ib._bootstrap_external>
+", line 940, in 
+exec_module
+  File "<frozen importl
+ib._bootstrap>", line 
+241, in _call_with_fram
+es_removed
+  File "D:\Cold 
+storage web and app\bac
+kend\alembic\env.py", 
+line 88, in <module>
+    asyncio.run(run_mig
+rations_online())
+  File "D:\new 
+project\full project\sm
+art-engineering-platfor
+m\backend\Lib\asyncio\r
+unners.py", line 190, 
+in run
+    return 
+runner.run(main)
+           
+^^^^^^^^^^^^^^^^
+  File "D:\new 
+project\full project\sm
+art-engineering-platfor
+m\backend\Lib\asyncio\r
+unners.py", line 118, 
+in run
+    return self._loop.r
+un_until_complete(task)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\new 
+project\full project\sm
+art-engineering-platfor
+m\backend\Lib\asyncio\b
+ase_events.py", line 
+654, in 
+run_until_complete
+    return 
+future.result()
+           
+^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\alembic\env.py", 
+line 80, in 
+run_migrations_online
+    await connection.ru
+n_sync(do_run_migration
+s)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\ext\as
+yncio\engine.py", line 
+888, in run_sync
+    return await 
+greenlet_spawn(
+           
+^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\util\_
+concurrency_py3k.py", 
+line 203, in 
+greenlet_spawn
+    result = 
+context.switch(value)
+             
+^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\alembic\env.py", 
+line 61, in 
+do_run_migrations
+    context.run_migrati
+ons()
+  File "<string>", 
+line 8, in 
+run_migrations
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\runtime\e
+nvironment.py", line 
+969, in run_migrations
+    self.get_context().
+run_migrations(**kw)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\runtime\m
+igration.py", line 
+626, in run_migrations
+    
+step.migration_fn(**kw)
+  File "D:\Cold 
+storage web and app\bac
+kend\alembic\versions\7
+ac84b9e79da_add_ota_and
+_firmware_models.py", 
+line 81, in upgrade
+    op.alter_column('se
+nsor_readings', 
+'temperature',
+  File "<string>", 
+line 8, in alter_column
+  File "<string>", 
+line 3, in alter_column
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\operation
+s\ops.py", line 1974, 
+in alter_column
+    return 
+operations.invoke(alt)
+           
+^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\operation
+s\base.py", line 452, 
+in invoke
+    return fn(self, 
+operation)
+           
+^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\operation
+s\toimpl.py", line 58, 
+in alter_column
+    operations.impl.alt
+er_column(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\ddl\postg
+resql.py", line 189, 
+in alter_column
+    self._exec(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\alembic\ddl\impl.
+py", line 256, in _exec
+    return conn.execute
+(construct, params)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1419, 
+in execute
+    return meth(
+           ^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\sql\dd
+l.py", line 187, in 
+_execute_on_connection
+    return connection._
+execute_ddl(
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1530, 
+in _execute_ddl
+    ret = 
+self._execute_context(
+          
+^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1846, 
+in _execute_context
+    return self._exec_s
+ingle_context(
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1986, 
+in _exec_single_context
+    self._handle_dbapi_
+exception(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 2363, 
+in 
+_handle_dbapi_exception
+    raise sqlalchemy_ex
+ception.with_traceback(
+exc_info[2]) from e
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\base.py", line 1967, 
+in _exec_single_context
+    self.dialect.do_exe
+cute(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\engine
+\default.py", line 
+952, in do_execute
+    cursor.execute(stat
+ement, parameters)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 585, in 
+execute
+    self._adapt_connect
+ion.await_(
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\util\_
+concurrency_py3k.py", 
+line 132, in await_only
+    return current.pare
+nt.switch(awaitable)  
+# type: ignore[no-any-r
+eturn,attr-defined] # 
+noqa: E501
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\util\_
+concurrency_py3k.py", 
+line 196, in 
+greenlet_spawn
+    value = await 
+result
+            
+^^^^^^^^^^^^
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 563, in 
+_prepare_and_execute
+    self._handle_except
+ion(error)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 513, in 
+_handle_exception
+    self._adapt_connect
+ion._handle_exception(e
+rror)
+  File "D:\Cold 
+storage web and app\bac
+kend\.venv\Lib\site-pac
+kages\sqlalchemy\dialec
+ts\postgresql\asyncpg.p
+y", line 797, in 
+_handle_exception
+    raise 
+translated_error from 
+error
+sqlalchemy.exc.DBAPIErr
+or: (sqlalchemy.dialect
+s.postgresql.asyncpg.Er
+ror) <class 'asyncpg.ex
+ceptions.FeatureNotSupp
+ortedError'>: cannot 
+alter type of a column 
+used by a view or rule
+DETAIL:  rule _RETURN 
+on view _timescaledb_in
+ternal._partial_view_2 
+depends on column 
+"temperature"
+[SQL: ALTER TABLE 
+sensor_readings ALTER 
+COLUMN temperature 
+TYPE FLOAT(4) ]
+(Background on this 
+error at: https://sqlal
+che.me/e/20/dbapi)

@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools<70.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cold-storage-backend"
+version = "1.0.0"
+description = "Solar IoT Cold Storage Monitoring & Control Platform — Backend API"
+requires-python = ">=3.12"
+
+dependencies = [
+    # Web framework
+    "fastapi==0.111.0",
+    "uvicorn[standard]==0.30.1",
+    "python-multipart==0.0.9",
+
+    # Database
+    "sqlalchemy[asyncio]==2.0.31",
+    "asyncpg==0.29.0",
+    "alembic==1.13.2",
+    "psycopg2-binary==2.9.9",   # For Alembic sync migrations
+
+    # Pydantic
+    "pydantic==2.8.2",
+    "pydantic-settings==2.4.0",
+
+    # Auth
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+    "pyotp==2.9.0",             # TOTP MFA
+    "qrcode[pil]==7.4.2",       # MFA QR code generation
+
+    # MQTT / AWS IoT Core
+    "awsiotsdk==1.22.0",        # AWS IoT Device SDK v2 for Python
+    "paho-mqtt==2.1.0",         # Dev fallback (Mosquitto)
+
+    # Task queue
+    "celery[redis]==5.4.0",
+    "redis[hiredis]==5.0.7",
+
+    # Notifications
+    "firebase-admin==6.5.0",    # FCM
+    "pywebpush==2.0.0",         # Web Push (VAPID)
+    "boto3==1.34.144",          # SES + S3 + Secrets Manager + IoT
+
+    # Observability
+    "prometheus-fastapi-instrumentator==7.0.0",
+    "opentelemetry-api==1.25.0",
+    "opentelemetry-sdk==1.25.0",
+    "opentelemetry-instrumentation-fastapi==0.46b0",
+    "opentelemetry-instrumentation-sqlalchemy==0.46b0",
+    "opentelemetry-exporter-otlp==1.25.0",
+
+    # Rate limiting
+    "slowapi==0.1.9",
+
+    # Utilities
+    "structlog==24.4.0",
+    "python-dotenv==1.0.1",
+    "bcrypt<4.0.0",             # Passlib compatibility
+    "httpx==0.27.0",            # Async HTTP client (for OIDC)
+    "tenacity==8.5.0",          # Retry logic
+    "cryptography==43.0.0",     # PII field encryption
+    "setuptools<70.0",         # Required for pkg_resources in some deps
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.1",
+    "pytest-asyncio==0.23.7",
+    "pytest-cov==5.0.0",
+    "httpx==0.27.0",
+    "anyio[trio]==4.4.0",
+    "factory-boy==3.3.1",
+    "faker==26.0.0",
+    "ruff==0.5.7",
+    "mypy==1.11.1",
+    "types-passlib",
+    "types-python-jose",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

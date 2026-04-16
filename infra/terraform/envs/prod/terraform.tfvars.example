@@ -1,0 +1,12 @@
+# General
+environment = "prod"
+aws_region  = "us-east-1"
+
+# Database
+db_instance_class = "db.t4g.medium"
+
+# Cache
+redis_node_type = "cache.t4g.micro"
+
+# Application
+backend_ecr_image_uri = "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/cold-storage-backend:latest"

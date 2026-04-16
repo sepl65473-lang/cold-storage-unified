@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Smaatech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar { background: #1e293b; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 sidebar p-8 hidden md:block">
+        <h1 class="text-2xl font-black mb-10">Smaatech<span class="text-emerald-500">.</span></h1>
+        <nav class="space-y-4">
+            <a href="/admin/dashboard" class="block p-3 rounded-xl bg-emerald-600/10 text-emerald-400 font-bold border border-emerald-500/20">Dashboard</a>
+            <a href="/admin/jobs" class="block p-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">Manage Jobs</a>
+            <a href="/admin/applications" class="block p-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">Applications</a>
+            <div class="pt-10">
+                <a href="/admin/logout" class="block p-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold">Logout</a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-12 overflow-y-auto">
+        <header class="flex justify-between items-center mb-12">
+            <div>
+                <h2 class="text-3xl font-bold">Recruitment Dashboard</h2>
+                <p class="text-slate-400">Welcome back, Admin</p>
+            </div>
+            <a href="/career" target="_blank" class="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:underline">View Live Site &rarr;</a>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-1">Total Applications</p>
+                <p class="text-4xl font-black text-white"><%= stats.total %></p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-emerald-500">
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-1">New Today</p>
+                <p class="text-4xl font-black text-white"><%= stats.today %></p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mb-1">Shortlisted</p>
+                <p class="text-4xl font-black text-white text-blue-400"><%= stats.shortlisted %></p>
+            </div>
+        </div>
+
+        <!-- Recent Applications Table -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Recent Applications</h3>
+                <a href="/admin/applications" class="text-sm font-bold text-emerald-400 hover:underline">View All</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-white/5 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                            <th class="p-4">Applicant</th>
+                            <th class="p-4">Position</th>
+                            <th class="p-4">Date</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <% recentApps.forEach(app => { %>
+                        <tr class="hover:bg-white/5 transition-all text-sm">
+                            <td class="p-4">
+                                <p class="font-bold text-white"><%= app.full_name %></p>
+                                <p class="text-xs text-slate-500"><%= app.email %></p>
+                            </td>
+                            <td class="p-4 font-medium text-slate-300"><%= app.position %></td>
+                            <td class="p-4 text-slate-400"><%= new Date(app.submitted_at).toLocaleDateString() %></td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest 
+                                    <%= app.status === 'new' ? 'bg-emerald-500/10 text-emerald-400' : 
+                                       app.status === 'rejected' ? 'bg-red-500/10 text-red-400' : 
+                                       'bg-blue-500/10 text-blue-400' %>">
+                                    <%= app.status %>
+                                </span>
+                            </td>
+                            <td class="p-4">
+                                <a href="/admin/applications" class="text-emerald-400 font-bold hover:underline">Manage</a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

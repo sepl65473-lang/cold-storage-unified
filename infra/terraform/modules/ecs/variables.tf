@@ -1,0 +1,12 @@
+variable "environment"          { type = string }
+variable "vpc_id"               { type = string }
+variable "public_subnet_ids"    { type = list(string) }
+variable "private_subnet_ids"   { type = list(string) }
+variable "ecr_image_uri"        { type = string }
+variable "careers_ecr_image_uri" { type = string }
+variable "db_secret_arn"        { type = string }
+variable "app_secrets_arn"      { type = string }
+variable "rds_endpoint"         { type = string }
+variable "redis_endpoint"       { type = string }
+variable "alb_security_group_id" { type = string }
+variable "ecs_security_group_id" { type = string }

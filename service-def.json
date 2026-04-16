@@ -1,0 +1,26 @@
+{
+    "cluster": "cold-storage-prod-cluster",
+    "serviceName": "backend-service",
+    "taskDefinition": "backend-task",
+    "loadBalancers": [
+        {
+            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:targetgroup/cold-storage-tg-prod/5532419203b3375b",
+            "containerName": "backend",
+            "containerPort": 8000
+        }
+    ],
+    "desiredCount": 1,
+    "launchType": "FARGATE",
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [
+                "subnet-0a5b394ce606f25af",
+                "subnet-0b720df5d094c057a"
+            ],
+            "securityGroups": [
+                "sg-0f6b3b516461ba097"
+            ],
+            "assignPublicIp": "ENABLED"
+        }
+    }
+}

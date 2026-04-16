@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications | Smaatech Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: white; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar { background: #1e293b; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <!-- Sidebar Placeholder -->
+    <aside class="w-64 sidebar p-8 hidden md:block">
+        <h1 class="text-2xl font-black mb-10">Smaatech<span class="text-emerald-500">.</span></h1>
+        <nav class="space-y-4">
+            <a href="/admin/dashboard" class="block p-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">Dashboard</a>
+            <a href="/admin/jobs" class="block p-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all">Manage Jobs</a>
+            <a href="/admin/applications" class="block p-3 rounded-xl bg-emerald-600/10 text-emerald-400 font-bold border border-emerald-500/20">Applications</a>
+            <div class="pt-10">
+                <a href="/admin/logout" class="block p-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold">Logout</a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-12 overflow-y-auto">
+        <header class="mb-12">
+            <h2 class="text-3xl font-bold">Candidate Applications</h2>
+            <p class="text-slate-400">Review and manage received resumes</p>
+        </header>
+
+        <!-- Filters -->
+        <div class="glass-card p-6 rounded-2xl mb-8">
+            <form action="/admin/applications" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-500">Position</label>
+                    <select name="position" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none">
+                        <option value="">All Positions</option>
+                        <% positions.forEach(p => { %>
+                            <option value="<%= p.position %>" <%= filters.position === p.position ? 'selected' : '' %>><%= p.position %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-500">Status</label>
+                    <select name="status" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none">
+                        <option value="">All Status</option>
+                        <option value="new" <%= filters.status === 'new' ? 'selected' : '' %>>New</option>
+                        <option value="reviewed" <%= filters.status === 'reviewed' ? 'selected' : '' %>>Reviewed</option>
+                        <option value="shortlisted" <%= filters.status === 'shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+                        <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-500">From Date</label>
+                    <input type="date" name="date_from" value="<%= filters.date_from %>" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none">
+                </div>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-bold py-2 rounded-lg transition-all">Filter</button>
+            </form>
+        </div>
+
+        <!-- Applications List -->
+        <div class="space-y-4">
+            <% if (apps.length === 0) { %>
+                <div class="glass-card p-12 text-center text-slate-500">No applications found matching your filters.</div>
+            <% } %>
+
+            <% apps.forEach(app => { %>
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row justify-between gap-6">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-xl font-bold"><%= app.full_name %></h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-slate-400 font-black uppercase"><%= app.status %></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-y-2 text-sm">
+                            <p class="text-slate-400">Email: <span class="text-white font-medium"><%= app.email %></span></p>
+                            <p class="text-slate-400">Position: <span class="text-emerald-400 font-bold"><%= app.position %></span></p>
+                            <p class="text-slate-400">Phone: <span class="text-white font-medium"><%= app.phone %></span></p>
+                            <p class="text-slate-400">Applied: <span class="text-white font-medium"><%= new Date(app.submitted_at).toLocaleDateString() %></span></p>
+                        </div>
+                        <% if (app.cover_letter) { %>
+                        <div class="mt-4 p-4 bg-white/5 rounded-xl border border-white/5">
+                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">Cover Letter Preview</p>
+                            <p class="text-xs text-slate-300 line-clamp-2 italic"><%= app.cover_letter %></p>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3 min-w-[200px]">
+                        <a href="/<%= app.resume_path %>" target="_blank" class="block w-full text-center bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition-all border border-white/5">
+                            Download Resume
+                        </a>
+                        <form action="/applications/status/<%= app.id %>" method="POST" class="flex gap-2">
+                            <select name="status" class="flex-1 bg-space-900 border border-white/10 rounded-lg px-3 py-2 text-xs text-white">
+                                <option value="new" <%= app.status === 'new' ? 'selected' : '' %>>New</option>
+                                <option value="reviewed" <%= app.status === 'reviewed' ? 'selected' : '' %>>Reviewed</option>
+                                <option value="shortlisted" <%= app.status === 'shortlisted' ? 'selected' : '' %>>Shortlist</option>
+                                <option value="rejected" <%= app.status === 'rejected' ? 'selected' : '' %>>Reject</option>
+                            </select>
+                            <button type="submit" class="bg-emerald-600 text-slate-900 font-black text-[10px] px-3 rounded-lg uppercase">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </main>
+</body>
+</html>

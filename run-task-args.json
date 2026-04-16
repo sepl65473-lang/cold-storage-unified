@@ -1,0 +1,17 @@
+{
+    "cluster": "cold-storage-prod-cluster",
+    "taskDefinition": "backend-task",
+    "launchType": "FARGATE",
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [
+                "subnet-0a5b394ce606f25af",
+                "subnet-0b720df5d094c057a"
+            ],
+            "securityGroups": [
+                "sg-0f6b3b516461ba097"
+            ],
+            "assignPublicIp": "ENABLED"
+        }
+    }
+}

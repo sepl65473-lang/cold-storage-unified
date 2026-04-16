@@ -1,0 +1,61 @@
+﻿{
+    "executionRoleArn":  "arn:aws:iam::288834682310:role/ecs-exec-role-prod",
+    "networkMode":  "awsvpc",
+    "cpu":  "256",
+    "requiresCompatibilities":  [
+                                    "FARGATE"
+                                ],
+    "containerDefinitions":  [
+                                 {
+                                     "name":  "careers",
+                                     "image":  "288834682310.dkr.ecr.us-east-1.amazonaws.com/smaatech-careers:afcbced61799bf73d4040211ced547d56db0ccb1",
+                                     "cpu":  0,
+                                     "portMappings":  [
+                                                          {
+                                                              "containerPort":  5000,
+                                                              "hostPort":  5000,
+                                                              "protocol":  "tcp"
+                                                          }
+                                                      ],
+                                     "essential":  true,
+                                     "environment":  [
+                                                         {
+                                                             "name":  "SESSION_SECRET",
+                                                             "value":  "smaatech-careers-session-prod-2026"
+                                                         },
+                                                         {
+                                                             "name":  "NODE_ENV",
+                                                             "value":  "production"
+                                                         },
+                                                         {
+                                                             "name":  "DATABASE_URL",
+                                                             "value":  "postgresql://cold_storage_user:c0CCSJfIbY68DqHZcjt3SkIJHRXkSuXr@cold-storage-prod.ck5qui62i949.us-east-1.rds.amazonaws.com:5432/cold_storage"
+                                                         },
+                                                         {
+                                                             "name":  "ADMIN_EMAIL",
+                                                             "value":  "Info@smaatechengineering.com"
+                                                         }
+                                                     ],
+                                     "mountPoints":  [
+
+                                                     ],
+                                     "volumesFrom":  [
+
+                                                     ],
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-group":  "/ecs/smaatech-careers-prod",
+                                                                              "awslogs-region":  "us-east-1",
+                                                                              "awslogs-stream-prefix":  "careers"
+                                                                          }
+                                                          },
+                                     "systemControls":  [
+
+                                                        ]
+                                 }
+                             ],
+    "family":  "smaatech-careers",
+    "taskRoleArn":  "arn:aws:iam::288834682310:role/ecs-task-role-prod",
+    "memory":  "512"
+}

@@ -1,0 +1,28 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::cold-storage-web-prod-288834682310",
+                "arn:aws:s3:::cold-storage-web-prod-288834682310/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceArn": [
+                        "arn:aws:cloudfront::288834682310:distribution/E3NLYVTA27ZIXC",
+                        "arn:aws:cloudfront::288834682310:distribution/E3OLWZ1I7XXQH7"
+                    ]
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "family": "cold-storage-backend",
+    "executionRoleArn": "ecs-exec-role-prod",
+    "taskRoleArn": "ecs-task-role-prod",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "backend",
+            "image": "288834682310.dkr.ecr.us-east-1.amazonaws.com/cold-storage-backend:latest",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "DATABASE_URL",
+                    "value": "postgresql+asyncpg://cold_storage_user:c0CCSJfIbY68DqHZcjt3SkIJHRXkSuXr@cold-storage-prod.ck5qui62i949.us-east-1.rds.amazonaws.com/cold_storage"
+                },
+                {
+                    "name": "REDIS_URL",
+                    "value": "redis://master.cold-storage-prod.lv6elk.use1.cache.amazonaws.com:6379/0"
+                },
+                {
+                    "name": "ENVIRONMENT",
+                    "value": "production"
+                },
+                {
+                    "name": "CORS_ORIGINS",
+                    "value": "[\"https://smaatechengineering.com\", \"https://www.smaatechengineering.com\", \"http://smaatechengineering.com\", \"http://www.smaatechengineering.com\"]"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/cold-storage-backend-prod",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
+}

@@ -1,0 +1,74 @@
+﻿{
+    "Rules": [
+        {
+            "RuleArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:listener-rule/app/cold-storage-alb-prod/f0f03e39230bc9fd/a185949913ed58c3/6a943a8b9aae3341",
+            "Priority": "10",
+            "Conditions": [
+                {
+                    "Field": "path-pattern",
+                    "Values": [
+                        "/admin/*",
+                        "/admin",
+                        "/applications/*",
+                        "/api/apply",
+                        "/api/jobs"
+                    ],
+                    "PathPatternConfig": {
+                        "Values": [
+                            "/admin/*",
+                            "/admin",
+                            "/applications/*",
+                            "/api/apply",
+                            "/api/jobs"
+                        ]
+                    }
+                }
+            ],
+            "Actions": [
+                {
+                    "Type": "forward",
+                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:targetgroup/smaatech-careers-tg-prod/ddce3ac017f3b7b5",
+                    "Order": 1,
+                    "ForwardConfig": {
+                        "TargetGroups": [
+                            {
+                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:targetgroup/smaatech-careers-tg-prod/ddce3ac017f3b7b5",
+                                "Weight": 1
+                            }
+                        ],
+                        "TargetGroupStickinessConfig": {
+                            "Enabled": false
+                        }
+                    }
+                }
+            ],
+            "IsDefault": false,
+            "Transforms": []
+        },
+        {
+            "RuleArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:listener-rule/app/cold-storage-alb-prod/f0f03e39230bc9fd/a185949913ed58c3/73b3ea3873564fe7",
+            "Priority": "default",
+            "Conditions": [],
+            "Actions": [
+                {
+                    "Type": "forward",
+                    "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:targetgroup/cold-storage-tg-prod/5532419203b3375b",
+                    "Order": 1,
+                    "ForwardConfig": {
+                        "TargetGroups": [
+                            {
+                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:288834682310:targetgroup/cold-storage-tg-prod/5532419203b3375b",
+                                "Weight": 1
+                            }
+                        ],
+                        "TargetGroupStickinessConfig": {
+                            "Enabled": false
+                        }
+                    }
+                }
+            ],
+            "IsDefault": true,
+            "Transforms": []
+        }
+    ]
+}

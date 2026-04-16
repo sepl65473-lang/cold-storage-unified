@@ -1,0 +1,148 @@
+"""TimescaleDB SensorReadings API — raw series, hourly aggregates, daily aggregates."""
+from __future__ import annotations
+
+import uuid
+from datetime import datetime, timedelta, timezone
+from typing import Sequence
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Header, status
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.auth.rbac import Permission, require_permission
+from app.db.session import get_db
+from app.config import settings
+from app.dependencies import get_current_org_id
+from app.models.device import Device
+from app.models.sensor_reading import SensorReading
+from app.models.user import User
+from app.schemas.reading import SensorReadingAggregatedResponse, SensorReadingResponse, SensorReadingIngest
+
+router = APIRouter()
+
+
+async def _verify_device_ownership(device_id: uuid.UUID, org_id: uuid.UUID, db: AsyncSession) -> None:
+    """Ensure the requested device belongs to the user's organization."""
+    result = await db.execute(select(Device.id).where(Device.id == device_id, Device.organization_id == org_id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Device not found in your organization")
+
+
+@router.post("/ingest", status_code=status.HTTP_201_CREATED)
+async def ingest_sensor_data(
+    payload: SensorReadingIngest,
+    x_api_key: str = Header(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    HTTP POST endpoint for IoT devices to push telemetry data.
+    Requires X-API-KEY internal header.
+    """
+    if x_api_key != settings.IOT_INGEST_TOKEN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Invalid IoT Ingest Token"
+        )
+    
+    # Verify device exists
+    device_result = await db.execute(select(Device).where(Device.id == payload.device_id))
+    device = device_result.scalar_one_or_none()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    # Create reading
+    reading = SensorReading(
+        time=payload.time or datetime.now(timezone.utc),
+        device_id=payload.device_id,
+        temperature=payload.temperature,
+        humidity=payload.humidity,
+        battery_level=payload.battery_level,
+        solar_power_watts=payload.solar_power_watts,
+        compressor_state=payload.compressor_state,
+        door_state=payload.door_state,
+        cooling_cycle_duration=payload.cooling_cycle_duration
+    )
+    
+    db.add(reading)
+    await db.commit()
+    
+    return {"status": "success", "timestamp": reading.time}
+
+
+@router.get("/{device_id}/raw", response_model=list[SensorReadingResponse])
+async def get_raw_readings(
+    device_id: uuid.UUID,
+    start_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc) - timedelta(hours=24)),
+    end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc)),
+    limit: int = Query(1000, le=5000),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_permission(Permission.VIEW_DEVICES)),
+) -> Sequence[SensorReading]:
+    """Fetch raw hypertable rows (optimized for < 24h charts)."""
+    await _verify_device_ownership(device_id, org_id, db)
+
+    result = await db.execute(
+        select(SensorReading)
+        .where(
+            SensorReading.device_id == device_id,
+            SensorReading.time >= start_time,
+            SensorReading.time <= end_time,
+        )
+        .order_by(SensorReading.time.asc())
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+
+@router.get("/{device_id}/hourly", response_model=list[SensorReadingAggregatedResponse])
+async def get_hourly_aggregates(
+    device_id: uuid.UUID,
+    start_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc) - timedelta(days=7)),
+    end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc)),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_permission(Permission.VIEW_DEVICES)),
+) -> list[dict]:
+    """Fetch from continuous aggregate view `sensor_readings_hourly` (optimized for 7d-30d charts)."""
+    await _verify_device_ownership(device_id, org_id, db)
+
+    # Use raw SQL as materialized views aren't natively mapped in SQLAlchemy 2.0 declarative easily
+    stmt = text("""
+        SELECT bucket, device_id, avg_temperature, avg_humidity,
+               avg_battery_level, avg_solar_power_watts, sample_count
+        FROM sensor_readings_hourly
+        WHERE device_id = :device_id
+          AND bucket >= :start
+          AND bucket <= :end
+        ORDER BY bucket ASC
+    """)
+    result = await db.execute(stmt, {"device_id": device_id, "start": start_time, "end": end_time})
+    rows = result.mappings().all()
+    return list(rows)
+
+
+@router.get("/{device_id}/daily", response_model=list[SensorReadingAggregatedResponse])
+async def get_daily_aggregates(
+    device_id: uuid.UUID,
+    start_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc) - timedelta(days=90)),
+    end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc)),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_permission(Permission.VIEW_DEVICES)),
+) -> list[dict]:
+    """Fetch from continuous aggregate view `sensor_readings_daily` (optimized for multi-month charts)."""
+    await _verify_device_ownership(device_id, org_id, db)
+
+    stmt = text("""
+        SELECT bucket, device_id, avg_temperature, avg_humidity,
+               avg_battery_level, avg_solar_power_watts, sample_count
+        FROM sensor_readings_daily
+        WHERE device_id = :device_id
+          AND bucket >= :start
+          AND bucket <= :end
+        ORDER BY bucket ASC
+    """)
+    result = await db.execute(stmt, {"device_id": device_id, "start": start_time, "end": end_time})
+    rows = result.mappings().all()
+    return list(rows)

@@ -1,0 +1,71 @@
+{
+    "CallerReference": "smaatech-prod-migration-final-v2",
+    "Aliases": {
+        "Quantity": 2,
+        "Items": [
+            "smaatechengineering.com",
+            "www.smaatechengineering.com"
+        ]
+    },
+    "DefaultRootObject": "index.html",
+    "Origins": {
+        "Quantity": 1,
+        "Items": [
+            {
+                "Id": "S3-smaatechengineering.com-prod",
+                "DomainName": "smaatechengineering.com-prod-288834682310.s3.us-east-1.amazonaws.com",
+                "S3OriginConfig": {
+                    "OriginAccessIdentity": ""
+                },
+                "OriginAccessControlId": "ERZME3D88HW6K"
+            }
+        ]
+    },
+    "DefaultCacheBehavior": {
+        "TargetOriginId": "S3-smaatechengineering.com-prod",
+        "ForwardedValues": {
+            "QueryString": false,
+            "Cookies": {
+                "Forward": "none"
+            }
+        },
+        "TrustedSigners": {
+            "Enabled": false,
+            "Quantity": 0
+        },
+        "ViewerProtocolPolicy": "redirect-to-https",
+        "MinTTL": 0,
+        "AllowedMethods": {
+            "Quantity": 2,
+            "Items": [
+                "GET",
+                "HEAD"
+            ],
+            "CachedMethods": {
+                "Quantity": 2,
+                "Items": [
+                    "GET",
+                    "HEAD"
+                ]
+            }
+        }
+    },
+    "CacheBehaviors": {
+        "Quantity": 0
+    },
+    "ViewerCertificate": {
+        "ACMCertificateArn": "arn:aws:acm:us-east-1:288834682310:certificate/fe2dc7a0-79da-4d7b-ba5a-b93a2f47c5e5",
+        "SSLSupportMethod": "sni-only",
+        "MinimumProtocolVersion": "TLSv1.2_2021",
+        "Certificate": "arn:aws:acm:us-east-1:288834682310:certificate/fe2dc7a0-79da-4d7b-ba5a-b93a2f47c5e5",
+        "CertificateSource": "acm"
+    },
+    "Restrictions": {
+        "GeoRestriction": {
+            "RestrictionType": "none",
+            "Quantity": 0
+        }
+    },
+    "Enabled": true,
+    "Comment": "Production Distribution for Smaatech Engineering"
+}
