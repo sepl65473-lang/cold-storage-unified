@@ -7,6 +7,7 @@ on:
     branches: [main, develop]
 
 env:
+  DUMMY: "true"
 
 # Global env removed to prevent leakage into production build
 
