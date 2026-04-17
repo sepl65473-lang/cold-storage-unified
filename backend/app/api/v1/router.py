@@ -11,6 +11,7 @@ from app.api.v1.admin.ota import router as admin_ota_router
 from app.api.v1.contact import router as contact_router
 from app.api.v1.stream import router as stream_router
 from app.api.v1.dashboard import router as dashboard_router
+from app.api.v1.reports import router as reports_router
 
 api_router = APIRouter()
 
@@ -25,6 +26,7 @@ api_router.include_router(readings_router, prefix="/readings", tags=["Sensor Rea
 api_router.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 api_router.include_router(admin_users_router, prefix="/admin/users", tags=["Admin: Users"])
 api_router.include_router(admin_ota_router, prefix="/admin/ota", tags=["Admin: OTA Updates"])
+api_router.include_router(reports_router, prefix="/reports", tags=["Reports"])
 
 
 @api_router.get("/health", tags=["Health"])
