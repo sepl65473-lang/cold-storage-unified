@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone, timedelta
 from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, func
@@ -31,12 +32,15 @@ async def get_chambers(db: AsyncSession = Depends(get_db)) -> list[dict[str, Any
         )
         reading = reading_res.scalar_one_or_none()
         
+        current_time = datetime.now(timezone.utc)
+        is_online = reading and (current_time - reading.time).total_seconds() < 300
+        
         chambers.append({
             "id": str(dev.id),
             "name": dev.name,
             "temp": reading.temperature if reading else 0.0,
             "humidity": reading.humidity if reading else 0.0,
-            "status": "online" if reading and reading.time > (func.now() - func.interval('5 minutes')) else "offline",
+            "status": "online" if is_online else "offline",
             "doorStatus": "open" if reading and reading.door_state else "closed"
         })
     return chambers
@@ -48,6 +52,10 @@ async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     total_res = await db.execute(select(func.count(Device.id)))
     total = total_res.scalar() or 0
     
+    # Calculate avg temperature
+    avg_temp_res = await db.execute(select(func.avg(SensorReading.temperature)))
+    avg_temp = avg_temp_res.scalar() or 0.0
+
     # Calculate avg humidity across all latest readings
     avg_hum_res = await db.execute(select(func.avg(SensorReading.humidity)))
     avg_humidity = avg_hum_res.scalar() or 0.0
