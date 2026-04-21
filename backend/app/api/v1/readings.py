@@ -127,9 +127,23 @@ async def ingest_sensor_data(
     return {"status": "success", "timestamp": reading.time}
 
 
+class BatchIngestReading(BaseModel):
+    temperature: float
+    humidity: float
+    battery_level: float | None = None
+    solar_power_watts: float | None = None
+    compressor_state: bool | None = None
+    door_state: bool | None = None
+    cooling_cycle_duration: int | None = None
+    time: datetime | None = None
+
+class BatchIngestPayload(BaseModel):
+    device_id: uuid.UUID
+    readings: list[BatchIngestReading]
+
 @router.post("/batch-ingest", status_code=status.HTTP_201_CREATED)
 async def ingest_batch_sensor_data(
-    payload: list[SensorReadingIngest],
+    payload: BatchIngestPayload,
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
@@ -140,10 +154,10 @@ async def ingest_batch_sensor_data(
     if h_api_key != settings.IOT_INGEST_TOKEN:
         raise HTTPException(status_code=403, detail="Invalid IoT Ingest Token")
 
-    if not payload:
+    if not payload.readings:
         return {"status": "skipped", "count": 0}
 
-    device_id = payload[0].device_id
+    device_id = payload.device_id
     device_result = await db.execute(select(Device).where(Device.id == device_id))
     device = device_result.scalar_one_or_none()
     
@@ -163,7 +177,7 @@ async def ingest_batch_sensor_data(
     readings = [
         SensorReading(
             time=p.time or datetime.now(timezone.utc),
-            device_id=p.device_id,
+            device_id=device_id,
             temperature=p.temperature,
             humidity=p.humidity,
             battery_level=p.battery_level,
@@ -172,7 +186,7 @@ async def ingest_batch_sensor_data(
             door_state=p.door_state,
             cooling_cycle_duration=p.cooling_cycle_duration
         )
-        for p in payload
+        for p in payload.readings
     ]
     
     db.add_all(readings)
