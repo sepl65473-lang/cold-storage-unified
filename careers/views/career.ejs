@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,8 @@
     <link rel="icon" type="image/png" href="https://www.smaatechengineering.com/sepl-logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -38,6 +40,7 @@
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
+
         .container-custom {
             max-width: 80rem;
             margin-left: auto;
@@ -45,6 +48,7 @@
             padding-left: 1.5rem;
             padding-right: 1.5rem;
         }
+
         .btn-primary {
             display: inline-flex;
             align-items: center;
@@ -56,17 +60,20 @@
             font-weight: 700;
             transition: all 0.3s;
         }
+
         .btn-primary:hover {
             background-color: #10b981;
-            box-shadow: 0 0 30px rgba(16,185,129,0.4);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
             transform: translateY(-0.25rem);
         }
+
         .glass-card {
             background-color: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
         }
+
         .text-gradient {
             background-clip: text;
             -webkit-background-clip: text;
@@ -75,6 +82,7 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col">
 
     <!-- Global Navigation -->
@@ -82,7 +90,8 @@
         <div class="container-custom flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center">
-                    <img src="https://www.smaatechengineering.com/sepl-logo.png" alt="SEPL Logo" class="h-full w-full object-cover scale-125">
+                    <img src="https://www.smaatechengineering.com/sepl-logo.png" alt="SEPL Logo"
+                        class="h-full w-full object-cover scale-125">
                 </div>
                 <span class="font-bold text-2xl tracking-tight text-white">
                     Smaatech<span class="text-brand-500">.</span>
@@ -100,36 +109,66 @@
 
     <!-- Content -->
     <main class="flex-grow pt-32 pb-24">
-        
+
         <!-- Hero Section (STRICT PROMPT STRINGS) -->
         <div class="container-custom text-center mb-24">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">Join Our <span class="text-gradient">Team</span></h1>
-            <p class="text-xl text-slate-400 font-light max-w-2xl mx-auto">Be part of a growing engineering excellence story</p>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">Join Our <span
+                    class="text-gradient">Team</span></h1>
+            <p class="text-xl text-slate-400 font-light max-w-2xl mx-auto">Be part of a growing engineering excellence
+                story</p>
         </div>
 
         <!-- Job Listings -->
         <section class="container-custom mb-32">
             <h2 class="text-3xl font-bold mb-10 text-white">Open Positions</h2>
             <div class="grid gap-6">
-                <% if (jobs && jobs.length > 0) { %>
-                    <% jobs.forEach(job => { %>
-                        <div class="glass-card p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:bg-white/10 transition-colors">
+                <% if (jobs && jobs.length> 0) { %>
+                    <% jobs.forEach(job=> { %>
+                        <div
+                            class="glass-card p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:bg-white/10 transition-colors">
                             <div class="space-y-4">
-                                <h3 class="text-2xl font-bold text-white"><%= job.title %></h3>
-                                <div class="flex flex-wrap gap-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
-                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg><%= job.location %></span>
-                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><%= job.experience %></span>
-                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><%= job.employment_type %></span>
+                                <h3 class="text-2xl font-bold text-white">
+                                    <%= job.title %>
+                                </h3>
+                                <div
+                                    class="flex flex-wrap gap-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
+                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <%= job.location %>
+                                    </span>
+                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <%= job.experience %>
+                                    </span>
+                                    <span class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <%= job.employment_type %>
+                                    </span>
                                 </div>
-                                <p class="text-slate-400 leading-relaxed font-light"><%= job.description %></p>
+                                <p class="text-slate-400 leading-relaxed font-light">
+                                    <%= job.description %>
+                                </p>
                             </div>
-                            <button onclick="scrollToApply('<%= job.title %>')" class="btn-primary whitespace-nowrap px-8">Apply Now</button>
+                            <button onclick="scrollToApply('<%= job.title %>')"
+                                class="btn-primary whitespace-nowrap px-8">Apply Now</button>
                         </div>
-                    <% }) %>
-                <% } else { %>
-                    <!-- STRICT PROMPT STRING -->
-                    <div class="glass-card p-16 text-center text-slate-500 italic">No openings at the moment. Check back soon!</div>
-                <% } %>
+                        <% }) %>
+                            <% } else { %>
+                                <!-- STRICT PROMPT STRING -->
+                                <div class="glass-card p-16 text-center text-slate-500 italic">No openings at the
+                                    moment. Check back soon!</div>
+                                <% } %>
             </div>
         </section>
 
@@ -140,40 +179,50 @@
                 <form id="career-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Full Name</label>
-                            <input type="text" name="full_name" required class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
+                            <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Full
+                                Name</label>
+                            <input type="text" name="full_name" required
+                                class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
                         </div>
                         <div class="space-y-2">
                             <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Email</label>
-                            <input type="email" name="email" required class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
+                            <input type="email" name="email" required
+                                class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Phone</label>
-                            <input type="tel" name="phone" pattern="[0-9]{10}" required placeholder="10-digit phone" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
+                            <input type="tel" name="phone" pattern="[0-9]{10}" required placeholder="10-digit phone"
+                                class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Position</label>
-                            <select name="position" id="position-dropdown" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
-                                <% if (jobs && jobs.length > 0) { %>
-                                    <% jobs.forEach(job => { %>
-                                        <option value="<%= job.title %>"><%= job.title %></option>
-                                    <% }) %>
-                                <% } else { %>
-                                    <option value="General Inquiry">General Inquiry</option>
-                                <% } %>
+                            <label
+                                class="text-xs font-semibold uppercase tracking-widest text-slate-500">Position</label>
+                            <select name="position" id="position-dropdown" required
+                                class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 transition-colors">
+                                <% if (jobs && jobs.length> 0) { %>
+                                    <% jobs.forEach(job=> { %>
+                                        <option value="<%= job.title %>">
+                                            <%= job.title %>
+                                        </option>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <option value="General Inquiry">General Inquiry</option>
+                                                <% } %>
                             </select>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Upload CV</label>
-                        <input type="file" name="resume" accept=".pdf,.doc,.docx" required class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-slate-400 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-500/20 file:text-brand-400 hover:file:bg-brand-500/30">
+                        <input type="file" name="resume" accept=".pdf,.doc,.docx" required
+                            class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-slate-400 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-500/20 file:text-brand-400 hover:file:bg-brand-500/30">
                     </div>
 
-                    <button type="submit" id="submit-btn" class="btn-primary w-full py-4 text-slate-900 shadow-lg">Submit details</button>
+                    <button type="submit" id="submit-btn"
+                        class="btn-primary w-full py-4 text-slate-900 shadow-lg">Submit details</button>
                     <p id="form-msg" class="text-center text-sm font-medium mt-4"></p>
                 </form>
             </div>
@@ -187,21 +236,25 @@
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center">
-                            <img src="https://www.smaatechengineering.com/sepl-logo.png" alt="SEPL Logo" class="h-full w-full object-cover scale-125">
+                            <img src="https://www.smaatechengineering.com/sepl-logo.png" alt="SEPL Logo"
+                                class="h-full w-full object-cover scale-125">
                         </div>
                         <span class="font-bold text-2xl tracking-tight text-white">
                             Smaatech<span class="text-brand-500">.</span>
                         </span>
                     </div>
                     <p class="text-slate-400 font-light pr-12">
-                        Architecting the infrastructure of tomorrow. Smaatech Group delivers highly engineered solutions across heavy civil, automation, and intelligent agritech ecosystems.
+                        Architecting the infrastructure of tomorrow. Smaatech Group delivers highly engineered solutions
+                        across heavy civil, automation, and intelligent agritech ecosystems.
                     </p>
                 </div>
                 <div>
                     <h4 class="font-bold text-white mb-6 uppercase tracking-widest text-xs">Divisions</h4>
                     <ul class="space-y-3 text-sm text-slate-400 font-light">
-                        <li><a href="/#services" class="hover:text-brand-400 transition-colors">Water Infrastructure</a></li>
-                        <li><a href="/#services" class="hover:text-brand-400 transition-colors">Industrial Automation</a></li>
+                        <li><a href="/#services" class="hover:text-brand-400 transition-colors">Water Infrastructure</a>
+                        </li>
+                        <li><a href="/#services" class="hover:text-brand-400 transition-colors">Industrial
+                                Automation</a></li>
                         <li><a href="/#services" class="hover:text-brand-400 transition-colors">Agritech IoT</a></li>
                         <li><a href="/career" class="text-brand-400 font-bold underline">Careers</a></li>
                     </ul>
@@ -209,8 +262,10 @@
                 <div>
                     <h4 class="font-bold text-white mb-6 uppercase tracking-widest text-xs">Platform</h4>
                     <ul class="space-y-3 text-sm text-slate-400 font-light">
-                        <li><a href="/#flagship" class="hover:text-brand-400 transition-colors">Features overview</a></li>
-                        <li><a href="/#flagship" class="hover:text-brand-400 transition-colors">Android Application</a></li>
+                        <li><a href="/#flagship" class="hover:text-brand-400 transition-colors">Features overview</a>
+                        </li>
+                        <li><a href="/#flagship" class="hover:text-brand-400 transition-colors">Android Application</a>
+                        </li>
                         <li><a href="/#flagship" class="hover:text-brand-400 transition-colors">Hardware Specs</a></li>
                     </ul>
                 </div>
@@ -238,7 +293,7 @@
 
             btn.disabled = true;
             btn.innerText = 'Syncing...';
-            
+
             try {
                 const res = await fetch('/api/apply', { method: 'POST', body: formData });
                 const data = await res.json();
@@ -260,4 +315,5 @@
         };
     </script>
 </body>
+
 </html>

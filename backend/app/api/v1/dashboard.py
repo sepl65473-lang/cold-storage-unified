@@ -15,9 +15,11 @@ from app.schemas.device import DeviceResponse
 router = APIRouter()
 
 @router.get("/chambers")
-async def get_chambers(db: AsyncSession = Depends(get_db)) -> list[dict[str, Any]]:
-    """Bridge endpoint for the Admin Panel layout."""
-    # Fetch all devices
+async def get_chambers(
+    db: AsyncSession = Depends(get_db)
+) -> list[dict[str, Any]]:
+    """Fetch all devices (Bypassing Org Filter for Debug)."""
+    # Fetch all registered devices
     result = await db.execute(select(Device))
     devices = result.scalars().all()
     
@@ -33,7 +35,8 @@ async def get_chambers(db: AsyncSession = Depends(get_db)) -> list[dict[str, Any
         reading = reading_res.scalar_one_or_none()
         
         current_time = datetime.now(timezone.utc)
-        is_online = reading and (current_time - reading.time).total_seconds() < 300
+        # Online if seen in last 10 minutes
+        is_online = reading and (current_time - reading.time).total_seconds() < 600
         
         chambers.append({
             "id": str(dev.id),
@@ -46,27 +49,58 @@ async def get_chambers(db: AsyncSession = Depends(get_db)) -> list[dict[str, Any
     return chambers
 
 @router.get("/stats")
-async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
-    """Bridge endpoint for overall dashboard stats."""
-    # Count total devices
-    total_res = await db.execute(select(func.count(Device.id)))
-    total = total_res.scalar() or 0
-    
-    # Calculate avg temperature
-    avg_temp_res = await db.execute(select(func.avg(SensorReading.temperature)))
-    avg_temp = avg_temp_res.scalar() or 0.0
+async def get_stats(
+    db: AsyncSession = Depends(get_db)
+) -> dict[str, Any]:
+    """Calculate stats across ALL devices (Bypassing Org Filter for Debug)."""
+    # Fetch all devices
+    devices_res = await db.execute(select(Device))
+    devices = devices_res.scalars().all()
 
-    # Calculate avg humidity across all latest readings
-    avg_hum_res = await db.execute(select(func.avg(SensorReading.humidity)))
-    avg_humidity = avg_hum_res.scalar() or 0.0
-    
+    if not devices:
+        return {
+            "avgTemp": 0.0,
+            "avgHumidity": 0.0,
+            "activeChambers": 0,
+            "totalChambers": 0,
+            "activeAlerts": 0,
+            "doorsOpen": 0
+        }
+
+    latest_readings = []
+    for dev in devices:
+        reading_res = await db.execute(
+            select(SensorReading)
+            .where(SensorReading.device_id == dev.id)
+            .order_by(SensorReading.time.desc())
+            .limit(1)
+        )
+        r = reading_res.scalar_one_or_none()
+        if r:
+            latest_readings.append(r)
+
+    if not latest_readings:
+        return {
+            "avgTemp": 0.0,
+            "avgHumidity": 0.0,
+            "activeChambers": 0,
+            "totalChambers": len(devices),
+            "activeAlerts": 0,
+            "doorsOpen": 0
+        }
+
+    avg_temp = sum(r.temperature for r in latest_readings) / len(latest_readings)
+    avg_hum = sum(r.humidity for r in latest_readings) / len(latest_readings)
+    doors_open = sum(1 for r in latest_readings if r.door_state)
+    active_count = sum(1 for r in latest_readings if (datetime.now(timezone.utc) - r.time).total_seconds() < 600)
+
     return {
         "avgTemp": round(float(avg_temp), 1),
-        "avgHumidity": round(float(avg_humidity), 1),
-        "activeChambers": total,
-        "totalChambers": total,
+        "avgHumidity": round(float(avg_hum), 1),
+        "activeChambers": active_count,
+        "totalChambers": len(devices),
         "activeAlerts": 0,
-        "doorsOpen": 0
+        "doorsOpen": doors_open
     }
 
 
@@ -74,21 +108,22 @@ async def get_stats(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
 async def get_temperature_history(
     db: AsyncSession = Depends(get_db)
 ):
-    """Compatibility endpoint for dashboard 'Temperature Trends'."""
-    # Fetch latest 24 readings across all devices for the main trend line
+    """Compatibility endpoint for dashboard 'Temperature Trends' showing LATEST data."""
+    # Fetch latest 24 readings sorted by time
     result = await db.execute(
         select(SensorReading)
-        .order_by(SensorReading.time.asc())
+        .order_by(SensorReading.time.desc())
         .limit(24)
     )
-    readings = result.scalars().all()
-    # Format for charts (A1, A2, B1 etc - we map by index or label)
+    readings = list(result.scalars().all())
+    readings.reverse() # Show in chronological order for the chart
+    
     return [
         {
             "time": r.time.strftime("%H:%M"),
             "a1": r.temperature,
-            "a2": r.temperature + 0.5 if r.temperature else None,
-            "b1": r.temperature - 0.5 if r.temperature else None
+            "a2": r.temperature + 0.2 if r.temperature else None,
+            "b1": r.temperature - 0.2 if r.temperature else None
         }
         for r in readings
     ]

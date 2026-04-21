@@ -36,8 +36,17 @@ async def download_report(
     """Generate and stream a CSV report based on the report_id."""
     
     # 1. Fetch data based on report type
-    if report_id == "weekly-temp" or report_id == "monthly-hum":
-        days = 7 if "weekly" in report_id else 30
+    supported_reports = ["weekly-temp", "monthly-hum", "uptime-report", "door-incidents", "energy-audit"]
+    
+    if report_id in supported_reports:
+        # Determine frequency
+        if "weekly" in report_id:
+            days = 7
+        elif "monthly" in report_id:
+            days = 30
+        else:
+            days = 90 # Historical logs
+            
         start_time = datetime.now(timezone.utc) - timedelta(days=days)
         
         result = await db.execute(
@@ -49,7 +58,7 @@ async def download_report(
         )
         data = result.all()
     else:
-        # Default empty or incident data
+        # Fallback or empty
         data = []
 
     # 2. Generate CSV in memory

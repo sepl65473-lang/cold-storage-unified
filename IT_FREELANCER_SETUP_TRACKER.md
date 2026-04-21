@@ -124,7 +124,7 @@
 - [/] **WAITING FOR DNS VALIDATION (CNAME Record):**
     - **Host:** `_b7e90c885da8129e1c3a6477c77c6677.dev`
     - **Value:** `_0e1c26b56e6d97c5555677c77c66777b.mzlghqyxwv.acm-validations.aws.`
-- [ ] Monitor validation status
+- [x] Monitor validation status (ISSUED - SSL Ready ✅)
 
 ### Step 19: Content Sync & Testing
 - [x] Run S3 sync to upload website files (Completed: Site live at http://dev.smaatechengineering.com.s3-website.ap-south-1.amazonaws.com)
@@ -149,9 +149,9 @@
 - [ ] Add `CLOUDFRONT_DIST_ID` in GitHub Settings
 
 ### Step 25: First Deploy
-- [ ] Run `git add .`, `git commit`, `git push origin main`
+- [x] Run `git add .`, `git commit`, `git push origin main` (SUCCESSFUL - 18/04/2026 ✅)
 - [ ] Verify GitHub Actions "Green Tick"
-- [ ] Visit `https://client1.com`
+- [ ] Visit `https://dev.smaatechengineering.com`
 
 ---
 

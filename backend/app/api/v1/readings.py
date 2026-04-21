@@ -127,7 +127,62 @@ async def ingest_sensor_data(
     return {"status": "success", "timestamp": reading.time}
 
 
+@router.post("/batch-ingest", status_code=status.HTTP_201_CREATED)
+async def ingest_batch_sensor_data(
+    payload: list[SensorReadingIngest],
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    HTTP POST endpoint for IoT devices to push multiple telemetry data points at once.
+    """
+    h_api_key = request.headers.get("X-API-KEY") or request.headers.get("x-api-key")
+    if h_api_key != settings.IOT_INGEST_TOKEN:
+        raise HTTPException(status_code=403, detail="Invalid IoT Ingest Token")
+
+    if not payload:
+        return {"status": "skipped", "count": 0}
+
+    device_id = payload[0].device_id
+    device_result = await db.execute(select(Device).where(Device.id == device_id))
+    device = device_result.scalar_one_or_none()
+    
+    if not device:
+        from app.models.user import Organization
+        org_result = await db.execute(select(Organization).where(Organization.name == "Demo Organization"))
+        org = org_result.scalar_one_or_none()
+        if not org:
+            org = Organization(id=uuid.uuid4(), name="Demo Organization", region="us-east-1")
+            db.add(org)
+            await db.flush()
+        
+        device = Device(id=device_id, organization_id=org.id, name=f"IoT Node: {str(device_id)[:8]}", status="online")
+        db.add(device)
+        await db.flush()
+
+    readings = [
+        SensorReading(
+            time=p.time or datetime.now(timezone.utc),
+            device_id=p.device_id,
+            temperature=p.temperature,
+            humidity=p.humidity,
+            battery_level=p.battery_level,
+            solar_power_watts=p.solar_power_watts,
+            compressor_state=p.compressor_state,
+            door_state=p.door_state,
+            cooling_cycle_duration=p.cooling_cycle_duration
+        )
+        for p in payload
+    ]
+    
+    db.add_all(readings)
+    await db.commit()
+    
+    return {"status": "success", "count": len(readings)}
+
+
 @router.get("/{device_id}/raw", response_model=list[SensorReadingResponse])
+
 async def get_raw_readings(
     device_id: uuid.UUID,
     start_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc) - timedelta(hours=24)),
