@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Header, status, Request
+from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -141,7 +142,7 @@ class BatchIngestPayload(BaseModel):
     device_id: uuid.UUID
     readings: list[BatchIngestReading]
 
-@router.post("/batch-ingest", status_code=status.HTTP_201_CREATED)
+@router.post("/ingest-batch", status_code=status.HTTP_201_CREATED)
 async def ingest_batch_sensor_data(
     payload: BatchIngestPayload,
     request: Request,
@@ -151,7 +152,11 @@ async def ingest_batch_sensor_data(
     HTTP POST endpoint for IoT devices to push multiple telemetry data points at once.
     """
     h_api_key = request.headers.get("X-API-KEY") or request.headers.get("x-api-key")
-    if h_api_key != settings.IOT_INGEST_TOKEN:
+    q_api_key = request.query_params.get("api_key")
+    
+    current_key = h_api_key or q_api_key
+    
+    if current_key != settings.IOT_INGEST_TOKEN:
         raise HTTPException(status_code=403, detail="Invalid IoT Ingest Token")
 
     if not payload.readings:
