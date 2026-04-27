@@ -26,6 +26,19 @@ class Settings(BaseSettings):
         if isinstance(values, dict) and "ENVIRONMENT" in values:
             aliases = {"prod": "production", "dev": "development"}
             values["ENVIRONMENT"] = aliases.get(str(values["ENVIRONMENT"]), values["ENVIRONMENT"])
+
+        if isinstance(values, dict) and "DEBUG" in values:
+            debug_aliases = {
+                "release": False,
+                "production": False,
+                "prod": False,
+                "debug": True,
+                "development": True,
+                "dev": True,
+            }
+            raw_debug = values["DEBUG"]
+            if isinstance(raw_debug, str):
+                values["DEBUG"] = debug_aliases.get(raw_debug.strip().lower(), raw_debug)
         
         if isinstance(values, dict) and "DATABASE_URL" in values:
             url = str(values["DATABASE_URL"])

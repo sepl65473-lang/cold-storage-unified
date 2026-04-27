@@ -30,6 +30,7 @@ class Permission(StrEnum):
 _ROLE_PERMISSIONS: dict[str, set[Permission]] = {
     UserRole.SUPERADMIN: set(Permission),  # all permissions
     UserRole.ADMIN: {
+        Permission.MANAGE_ORGANISATIONS,
         Permission.MANAGE_USERS,
         Permission.VIEW_DEVICES,
         Permission.SEND_COMMANDS,

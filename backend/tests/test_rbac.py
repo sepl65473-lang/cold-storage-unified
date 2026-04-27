@@ -19,4 +19,5 @@ def test_operator_can_control_but_not_manage_or_export():
 def test_admin_can_export_and_control():
     assert has_permission(UserRole.ADMIN, Permission.VIEW_DEVICES)
     assert has_permission(UserRole.ADMIN, Permission.SEND_COMMANDS)
+    assert has_permission(UserRole.ADMIN, Permission.MANAGE_ORGANISATIONS)
     assert has_permission(UserRole.ADMIN, Permission.EXPORT_DATA)

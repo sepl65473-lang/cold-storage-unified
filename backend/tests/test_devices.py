@@ -76,7 +76,7 @@ async def test_list_devices_returns_list(viewer_client: AsyncClient) -> None:
 async def test_create_device_as_admin_returns_201() -> None:
     """Admin can create a device (POST /devices/ → 201)."""
     device = _mock_device()
-    admin = make_user(UserRole.SUPERADMIN)
+    admin = make_user(UserRole.ADMIN)
 
     app.dependency_overrides[get_current_user] = lambda: admin
     app.dependency_overrides[get_db] = lambda: _db_with_device(device)
@@ -119,7 +119,7 @@ async def test_create_device_as_operator_returns_403(operator_client: AsyncClien
 async def test_edit_device_as_admin_returns_200() -> None:
     """Admin can PATCH a device."""
     device = _mock_device()
-    admin = make_user(UserRole.SUPERADMIN)
+    admin = make_user(UserRole.ADMIN)
 
     app.dependency_overrides[get_current_user] = lambda: admin
     app.dependency_overrides[get_db] = lambda: _db_with_device(device)
@@ -152,7 +152,7 @@ async def test_edit_device_as_viewer_returns_403(viewer_client: AsyncClient) -> 
 async def test_deactivate_device_as_admin_returns_200() -> None:
     """Admin can deactivate a device via PATCH is_active=false."""
     device = _mock_device()
-    admin = make_user(UserRole.SUPERADMIN)
+    admin = make_user(UserRole.ADMIN)
 
     app.dependency_overrides[get_current_user] = lambda: admin
     app.dependency_overrides[get_db] = lambda: _db_with_device(device)
