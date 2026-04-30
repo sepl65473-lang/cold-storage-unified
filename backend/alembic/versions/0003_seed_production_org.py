@@ -98,8 +98,8 @@ def upgrade() -> None:
 
     # 4. Register ESP32 device
     conn.execute(sa.text("""
-        INSERT INTO devices (id, organization_id, name, status, thing_name)
-        VALUES (:id, :org_id, 'Smart Cold Box - 01', 'offline', 'esp32_sepl_01')
+        INSERT INTO devices (id, organization_id, name, status, thing_name, is_active)
+        VALUES (:id, :org_id, 'Smart Cold Box - 01', 'offline', 'esp32_sepl_01', true)
         ON CONFLICT (id) DO NOTHING
     """), {"id": DEVICE_ID, "org_id": ORG_ID})
 
