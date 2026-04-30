@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Header, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -78,35 +78,14 @@ async def ingest_sensor_data(
             detail="Invalid IoT Ingest Token"
         )
     
-    # ─── Auto-Registration Logic ──────────────────────────────────────────────
+    # ─── Device Lookup ────────────────────────────────────────────────────────
     device_result = await db.execute(select(Device).where(Device.id == payload.device_id))
     device = device_result.scalar_one_or_none()
-    
     if not device:
-        from app.models.user import Organization
-        # 1. Ensure Demo Organization exists
-        org_result = await db.execute(select(Organization).where(Organization.name == "Demo Organization"))
-        org = org_result.scalar_one_or_none()
-        
-        if not org:
-            org = Organization(
-                id=uuid.uuid4(),
-                name="Demo Organization",
-                region="us-east-1"
-            )
-            db.add(org)
-            await db.flush()
-        
-        # 2. Auto-register Device
-        device = Device(
-            id=payload.device_id,
-            organization_id=org.id,
-            name=f"IoT Node: {str(payload.device_id)[:8]}",
-            status="online"
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Device {payload.device_id} not registered. Register it in the admin panel first."
         )
-        db.add(device)
-        await db.commit()
-        await db.refresh(device)
     # ──────────────────────────────────────────────────────────────────────────
 
     # Create reading
@@ -164,20 +143,11 @@ async def ingest_batch_sensor_data(
 
     device_id = payload.device_id
     device_result = await db.execute(select(Device).where(Device.id == device_id))
-    device = device_result.scalar_one_or_none()
-    
-    if not device:
-        from app.models.user import Organization
-        org_result = await db.execute(select(Organization).where(Organization.name == "Demo Organization"))
-        org = org_result.scalar_one_or_none()
-        if not org:
-            org = Organization(id=uuid.uuid4(), name="Demo Organization", region="us-east-1")
-            db.add(org)
-            await db.flush()
-        
-        device = Device(id=device_id, organization_id=org.id, name=f"IoT Node: {str(device_id)[:8]}", status="online")
-        db.add(device)
-        await db.flush()
+    if not device_result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Device {device_id} not registered. Register it in the admin panel first."
+        )
 
     readings = [
         SensorReading(
