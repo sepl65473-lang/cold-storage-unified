@@ -22,8 +22,8 @@ def upgrade() -> None:
 
     # 1. Create SEPL Cold Storage organisation first (needed before moving users)
     conn.execute(sa.text("""
-        INSERT INTO organizations (id, name, region)
-        VALUES (:id, 'SEPL Cold Storage', 'ap-south-1')
+        INSERT INTO organizations (id, name, region, is_active)
+        VALUES (:id, 'SEPL Cold Storage', 'ap-south-1', true)
         ON CONFLICT (id) DO NOTHING
     """), {"id": ORG_ID})
 
