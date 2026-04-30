@@ -20,7 +20,24 @@ DEVICE_ID  = "c3a1b2d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
 def upgrade() -> None:
     conn = op.get_bind()
 
-    # 1. Remove old Demo Organization (and its devices + settings) if present
+    # 1. Create SEPL Cold Storage organisation first (needed before moving users)
+    conn.execute(sa.text("""
+        INSERT INTO organizations (id, name, region)
+        VALUES (:id, 'SEPL Cold Storage', 'ap-south-1')
+        ON CONFLICT (id) DO NOTHING
+    """), {"id": ORG_ID})
+
+    # 2. Move all users from Demo Organization -> SEPL Cold Storage
+    #    (preserves admin accounts — avoids FK violation on delete)
+    conn.execute(sa.text("""
+        UPDATE users
+        SET organization_id = :new_org
+        WHERE organization_id IN (
+            SELECT id FROM organizations WHERE name = 'Demo Organization'
+        )
+    """), {"new_org": ORG_ID})
+
+    # 3. Delete Demo Organization data (users already moved, FK safe now)
     conn.execute(sa.text("""
         DELETE FROM sensor_readings
         WHERE device_id IN (
