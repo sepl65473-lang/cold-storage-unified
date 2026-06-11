@@ -49,9 +49,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Check S3 bucket
+        run: |
+          echo "Checking bucket: ${{ secrets.WEB_S3_BUCKET }}"
+          aws s3 ls s3://${{ secrets.WEB_S3_BUCKET }} || echo "WARNING: Bucket check failed"
       - name: Sync to S3
-        run: aws s3 sync dist/ s3://${{ secrets.WEB_S3_BUCKET }} --delete --cache-control "max-age=31536000,immutable"
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.WEB_S3_BUCKET }} \
+            --delete \
+            --cache-control "max-age=31536000,immutable"
+      - name: Set index.html cache
+        run: |
+          aws s3 cp s3://${{ secrets.WEB_S3_BUCKET }}/index.html \
+            s3://${{ secrets.WEB_S3_BUCKET }}/index.html \
+            --metadata-directive REPLACE \
+            --cache-control "no-cache,no-store,must-revalidate" \
+            --content-type "text/html"
       - name: Invalidate CloudFront cache
+        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
