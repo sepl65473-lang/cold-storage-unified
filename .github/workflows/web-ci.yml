@@ -25,11 +25,21 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
+      - name: Set API URL
+        id: apiurl
+        run: |
+          API_URL="${{ secrets.VITE_API_BASE_URL }}"
+          if [ -z "$API_URL" ]; then
+            API_URL="http://cold-storage-alb-prod-890284825.us-east-1.elb.amazonaws.com/api/v1"
+            echo "Secret not set — using default backend URL"
+          fi
+          echo "url=$API_URL" >> $GITHUB_OUTPUT
+
       - run: npm run build
         working-directory: web
         env:
           VITE_USE_MOCK: "false"
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ steps.apiurl.outputs.url }}
       - uses: actions/upload-artifact@v4
         with:
           name: web-dist
