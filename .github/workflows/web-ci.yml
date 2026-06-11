@@ -53,25 +53,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: List S3 buckets and check target
+      - name: Show S3 buckets in account
         run: |
-          echo "=== All buckets in account ==="
+          echo "Target bucket from secret: ${{ secrets.WEB_S3_BUCKET }}"
+          echo "--- All buckets in this AWS account ---"
           aws s3 ls
-          echo "=== Checking target: ${{ secrets.WEB_S3_BUCKET }} ==="
-          aws s3 ls s3://${{ secrets.WEB_S3_BUCKET }} && echo "Bucket OK" || echo "Bucket NOT accessible"
-      - name: Create bucket if missing
-        run: |
-          aws s3api head-bucket --bucket ${{ secrets.WEB_S3_BUCKET }} 2>/dev/null || \
-          aws s3api create-bucket \
-            --bucket ${{ secrets.WEB_S3_BUCKET }} \
-            --region ${{ secrets.AWS_REGION }} \
-            $([ "${{ secrets.AWS_REGION }}" != "us-east-1" ] && echo "--create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}")
       - name: Sync to S3
-        run: |
-          aws s3 sync dist/ s3://${{ secrets.WEB_S3_BUCKET }} --delete
+        env:
+          BUCKET: ${{ secrets.WEB_S3_BUCKET }}
+        run: aws s3 sync dist/ s3://$BUCKET --delete
       - name: Set index.html no-cache
+        env:
+          BUCKET: ${{ secrets.WEB_S3_BUCKET }}
         run: |
-          aws s3 cp dist/index.html s3://${{ secrets.WEB_S3_BUCKET }}/index.html \
+          aws s3 cp dist/index.html s3://$BUCKET/index.html \
             --cache-control "no-cache,no-store,must-revalidate" \
             --content-type "text/html"
       - name: Invalidate CloudFront cache
