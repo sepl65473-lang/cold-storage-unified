@@ -5,7 +5,7 @@ const stored = (() => { try { return JSON.parse(localStorage.getItem("sepl_env")
 export const ENV = {
   API_BASE_URL: (stored.API_BASE_URL || import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, ""),
   WS_URL:       stored.WS_URL ?? (import.meta.env.VITE_WS_URL || ""),
-  USE_MOCK:     (import.meta.env.VITE_USE_MOCK ?? "true") === "true",
+  USE_MOCK:     (import.meta.env.VITE_USE_MOCK ?? "false") === "true",
 };
 
 export function saveEnvOverrides(overrides) {
