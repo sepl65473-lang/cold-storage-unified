@@ -1,4 +1,4 @@
-// Central runtime config. Vite env vars are build-time defaults.
+// Central runtime config. Vite env vars are build-time defaults; VITE_USE_MOCK defaults to false (live mode).
 // URL overrides saved via Settings → Integrations take effect after reload.
 const stored = (() => { try { return JSON.parse(localStorage.getItem("sepl_env") || "{}"); } catch { return {}; } })();
 
