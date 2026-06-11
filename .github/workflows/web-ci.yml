@@ -47,7 +47,7 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy to S3 + CloudFront (Production)
+    name: Deploy to portal.smaatechengineering.com/panel/
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -62,70 +62,25 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
 
-      - name: Set bucket name (use secret or fallback)
-        id: bucket
+      - name: Sync to S3 /panel/ path
         run: |
-          # Use WEB_S3_BUCKET secret if set, else use a default name
-          BUCKET="${{ secrets.WEB_S3_BUCKET }}"
-          if [ -z "$BUCKET" ]; then
-            BUCKET="sepl-coldchain-web-frontend"
-            echo "WEB_S3_BUCKET secret is empty — using default: $BUCKET"
-          else
-            echo "Using bucket from secret"
-          fi
-          echo "name=$BUCKET" >> $GITHUB_OUTPUT
-          echo "Bucket: $BUCKET" >> $GITHUB_STEP_SUMMARY
-
-      - name: Create S3 bucket if it does not exist
-        run: |
-          BUCKET="${{ steps.bucket.outputs.name }}"
-          REGION="${{ secrets.AWS_REGION }}"
-          if aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
-            echo "Bucket already exists: $BUCKET"
-          else
-            echo "Creating bucket: $BUCKET in $REGION"
-            if [ "$REGION" = "us-east-1" ]; then
-              aws s3api create-bucket --bucket "$BUCKET"
-            else
-              aws s3api create-bucket --bucket "$BUCKET" --region "$REGION" \
-                --create-bucket-configuration LocationConstraint="$REGION"
-            fi
-            # Allow public read (static website)
-            aws s3api delete-public-access-block --bucket "$BUCKET"
-            aws s3api put-bucket-policy --bucket "$BUCKET" --policy "{
-              \"Version\": \"2012-10-17\",
-              \"Statement\": [{
-                \"Effect\": \"Allow\",
-                \"Principal\": \"*\",
-                \"Action\": \"s3:GetObject\",
-                \"Resource\": \"arn:aws:s3:::$BUCKET/*\"
-              }]
-            }"
-            aws s3 website s3://$BUCKET --index-document index.html --error-document index.html
-            echo "Bucket created and configured for static hosting"
-          fi
-
-      - name: Sync to S3
-        run: |
-          BUCKET="${{ steps.bucket.outputs.name }}"
-          aws s3 sync dist/ s3://$BUCKET --delete --no-progress
-          echo "### Deploy successful!" >> $GITHUB_STEP_SUMMARY
-          echo "Bucket: $BUCKET" >> $GITHUB_STEP_SUMMARY
-          REGION="${{ secrets.AWS_REGION }}"
-          echo "URL: http://$BUCKET.s3-website-$REGION.amazonaws.com" >> $GITHUB_STEP_SUMMARY
+          aws s3 sync dist/ s3://cold-storage-web-prod-288834682310/panel/ \
+            --delete --no-progress
+          echo "Deployed to s3://cold-storage-web-prod-288834682310/panel/"
 
       - name: Set index.html no-cache
         run: |
-          BUCKET="${{ steps.bucket.outputs.name }}"
-          aws s3 cp dist/index.html s3://$BUCKET/index.html \
+          aws s3 cp dist/index.html s3://cold-storage-web-prod-288834682310/panel/index.html \
             --cache-control "no-cache,no-store,must-revalidate" \
             --content-type "text/html"
 
-      - name: Invalidate CloudFront cache
-        continue-on-error: true
+      - name: Invalidate CloudFront cache for /panel/*
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+            --distribution-id E3NLYVTA27ZIXC \
+            --paths "/panel/*"
+          echo "CloudFront invalidated: /panel/*"
+          echo "### Deploy complete!" >> $GITHUB_STEP_SUMMARY
+          echo "URL: https://portal.smaatechengineering.com/panel/" >> $GITHUB_STEP_SUMMARY

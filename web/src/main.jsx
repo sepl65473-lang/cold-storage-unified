@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter as BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { QueryProvider } from "./app/providers/QueryProvider.jsx";
 import { ErrorBoundary } from "./app/providers/ErrorBoundary.jsx";
