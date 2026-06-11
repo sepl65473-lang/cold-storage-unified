@@ -61,7 +61,16 @@ jobs:
       - name: Sync to S3
         env:
           BUCKET: ${{ secrets.WEB_S3_BUCKET }}
-        run: aws s3 sync dist/ s3://$BUCKET
+        run: |
+          echo "## S3 Sync Debug" >> $GITHUB_STEP_SUMMARY
+          echo "Bucket secret empty? $([ -z '$BUCKET' ] && echo YES || echo NO)" >> $GITHUB_STEP_SUMMARY
+          aws s3 sync dist/ s3://$BUCKET --no-progress 2>sync_err.txt; CODE=$?
+          if [ $CODE -ne 0 ]; then
+            echo "### Error:" >> $GITHUB_STEP_SUMMARY
+            cat sync_err.txt >> $GITHUB_STEP_SUMMARY
+            cat sync_err.txt
+            exit $CODE
+          fi
       - name: Set index.html no-cache
         env:
           BUCKET: ${{ secrets.WEB_S3_BUCKET }}
