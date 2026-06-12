@@ -5,9 +5,11 @@ import { EP } from "./endpoints.js";
 import { ENV } from "../../config/env.js";
 
 // Role → frontend permission list mapping
+const ALL_PERMS = ["dashboard","produce","chambers","devices","gateways","alerts","notifications","work_orders","dispatch","inventory","reports","audit","users","roles","settings"];
 const ROLE_PERMS = {
-  super_admin: ["dashboard","produce","chambers","devices","gateways","alerts","notifications","work_orders","dispatch","inventory","reports","audit","users","roles","settings"],
-  admin:       ["dashboard","produce","chambers","devices","gateways","alerts","notifications","work_orders","dispatch","inventory","reports","audit","users","roles","settings"],
+  superadmin:  ALL_PERMS,
+  super_admin: ALL_PERMS,
+  admin:       ALL_PERMS,
   operator:    ["dashboard","produce","chambers","devices","alerts","notifications","work_orders","dispatch","inventory"],
   viewer:      ["dashboard","produce","alerts","notifications"],
 };
