@@ -52,37 +52,28 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Register new task definition with updated image
-        id: task-def
-        env:
-          IMAGE: ${{ needs.build.outputs.image }}
+
+      - name: Fetch current task definition
         run: |
-          # Fetch current task definition, strip read-only fields, update image
           aws ecs describe-task-definition \
             --task-definition backend \
-            --query 'taskDefinition' \
-            --output json \
-          | jq --arg IMAGE "$IMAGE" '
-              .containerDefinitions[0].image = $IMAGE
-              | del(.taskDefinitionArn, .revision, .status,
-                    .requiresAttributes, .compatibilities,
-                    .registeredAt, .registeredBy, .deregisteredAt)
-            ' > new-task-def.json
+            --query taskDefinition \
+            --output json > task-definition.json
+          echo "Task definition container image:"
+          cat task-definition.json | python3 -c "import json,sys; td=json.load(sys.stdin); print(td['containerDefinitions'][0]['image'])"
 
-          # Register the new revision and capture its ARN
-          NEW_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://new-task-def.json \
-            --query 'taskDefinition.taskDefinitionArn' \
-            --output text)
+      - name: Render updated task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: backend
+          image: ${{ needs.build.outputs.image }}
 
-          echo "arn=$NEW_ARN" >> $GITHUB_OUTPUT
-          echo "Registered new task definition: $NEW_ARN"
-
-      - name: Deploy new task definition to ECS
-        run: |
-          aws ecs update-service \
-            --cluster cold-storage-prod-cluster \
-            --service backend \
-            --task-definition ${{ steps.task-def.outputs.arn }} \
-            --force-new-deployment
-          echo "ECS deployment triggered with new image"
+      - name: Deploy updated task definition to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: backend
+          cluster: cold-storage-prod-cluster
+          wait-for-service-stability: false
