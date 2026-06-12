@@ -51,11 +51,13 @@ function pollChannel(onMessage) {
       for (let i = 0; i < len; i++) {
         const tRow = tempArr[i];
         const hRow = humArr[i];
+        // Backend returns { time, temp } and { time, val }
+        const t = tRow?.temp ?? null;
         onMessage({
           type: "telemetry",
           payload: {
             t:    tRow?.time || hRow?.time || "--:--",
-            temp: { frozen: tRow?.a1 ?? null, chilled: tRow?.a2 ?? tRow?.a1 ?? null, pharma: tRow?.b1 ?? tRow?.a1 ?? null },
+            temp: { frozen: t, chilled: t, pharma: t },
             hum:  { frozen: hRow?.val ?? null, chilled: hRow?.val ?? null },
           },
         });
@@ -109,7 +111,7 @@ function pollChannel(onMessage) {
       }
     } catch { /* ignore poll errors */ }
 
-    if (active) timer = setTimeout(pollLatest, 10000);
+    if (active) timer = setTimeout(pollLatest, 10000); // poll every 10s
   };
 
   // Start: seed history first, then begin polling

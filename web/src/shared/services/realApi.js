@@ -226,7 +226,15 @@ export const api = {
   updateRole: okStub,
   deleteRole: okStub,
 
-  // ── Telemetry history — uses backend /history/* dashboard endpoints ────────
+  // ── Dashboard stats — avgTemp, avgHumidity, activeChambers, activeAlerts ───
+  getStats: async () => {
+    try {
+      const res = await http.get("/stats");
+      return res || {};
+    } catch { return {}; }
+  },
+
+  // ── Telemetry history — backend returns { time, temp } and { time, val } ───
   getTelemetryHistory: async () => {
     try {
       const [tempRes, humRes] = await Promise.all([
@@ -236,10 +244,10 @@ export const api = {
       const tempArr = Array.isArray(tempRes) ? tempRes : [];
       const humArr  = Array.isArray(humRes)  ? humRes  : [];
       const temp = tempArr.map((r) => ({
-        t: r.time, frozen: r.a1, chilled: r.a2 ?? r.a1, pharma: r.b1 ?? r.a1,
+        t: r.time, frozen: r.temp ?? null, chilled: r.temp ?? null, pharma: r.temp ?? null,
       }));
       const hum = humArr.map((r) => ({
-        t: r.time, frozen: r.val, chilled: r.val,
+        t: r.time, frozen: r.val ?? null, chilled: r.val ?? null,
       }));
       return { temp, hum };
     } catch { return { temp: [], hum: [] }; }

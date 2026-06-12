@@ -19,6 +19,8 @@ import { useGateways } from "../gateways/api.js";
 import { useWorkOrders, useDispatch } from "../logistics/api.js";
 import { useFacilities } from "../../shared/hooks/useFacilities.js";
 import { useUiStore } from "../../stores/uiStore.js";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../../shared/services/api.js";
 import { downloadSummaryCsv } from "../../shared/utils/download.js";
 import { Thermometer, Droplets, Wifi, WifiOff, AlertTriangle, DoorOpen, RefreshCw, Download, Truck } from "lucide-react";
 
@@ -43,6 +45,8 @@ const avgReading = (row, keys) => {
 
 export function DashboardPage() {
   const { temp, hum, feed } = useRealtimeStore();
+  const statsQ = useQuery({ queryKey: ["stats"], queryFn: () => api.getStats(), refetchInterval: 10000 });
+  const stats = statsQ.data || {};
   const devicesQ = useDevices();
   const alertsQ = useAlerts();
   const chambersQ = useChambers();
@@ -68,13 +72,14 @@ export function DashboardPage() {
   const online = devices.filter((d) => d.status === "Online").length;
   const offline = devices.filter((d) => d.status === "Offline").length;
   const deviceTotal = devicesQ.total || devices.length;
-  const openAlerts = alerts.filter((a) => a.status === "Open").length;
-  const openDoors = chambers.filter((c) => c.doors === "Open").length;
+  const openAlerts = stats.activeAlerts ?? alerts.filter((a) => a.status === "Open").length;
+  const openDoors  = stats.doorsOpen    ?? chambers.filter((c) => c.doors === "Open").length;
 
   const latestTemp = temp.at(-1);
   const latestHum = hum.at(-1);
-  const avgTemp = avgReading(latestTemp, ["frozen", "chilled", "pharma"]);
-  const avgHum = avgReading(latestHum, ["frozen", "chilled"]);
+  // Use /stats for KPIs (always fresh), fall back to realtime store
+  const avgTemp = stats.avgTemp ?? avgReading(latestTemp, ["frozen", "chilled", "pharma"]);
+  const avgHum  = stats.avgHumidity ?? avgReading(latestHum, ["frozen", "chilled"]);
 
   const dash = (v) => (v === null || v === undefined ? "-" : String(v));
 
