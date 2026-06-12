@@ -4,7 +4,7 @@ from __future__ import annotations
 import uuid
 from typing import Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -104,14 +104,15 @@ async def update_device(
     return device
 
 
-@router.delete("/{device_id}", status_code=204, response_class=Response)
+@router.delete("/{device_id}")
 async def delete_device(
     device_id: uuid.UUID,
     org_id: uuid.UUID = Depends(get_current_org_id),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(require_permission(Permission.MANAGE_ORGANISATIONS)),
-) -> None:
+) -> dict:
     # Soft delete — sensor_readings FK has no CASCADE, hard delete would fail
     device = await get_device(device_id, org_id, db, user)
     device.is_active = False
     await db.commit()
+    return {"deleted": True}
