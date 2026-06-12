@@ -232,13 +232,12 @@ export const api = {
     return res?.data || res;
   },
   updateWorkOrder: async (id, body) => {
-    // id may be the short display id or _id — find the real UUID from _id
     const realId = body._id || id;
-    const res = await http.put(`${EP.workOrders}/${realId}`, body);
+    const res = await http.put(`/work-orders/${realId}`, body);
     return res?.data || res;
   },
   deleteWorkOrder: async (id) => {
-    await http.del(`${EP.workOrders}/${id}`);
+    await http.del(`/work-orders/${id}`);
     return { ok: true };
   },
 
@@ -254,11 +253,11 @@ export const api = {
   },
   updateDispatch: async (id, body) => {
     const realId = body._id || id;
-    const res = await http.put(`${EP.dispatch}/${realId}`, body);
+    const res = await http.put(`/dispatch/${realId}`, body);
     return res?.data || res;
   },
   deleteDispatch: async (id) => {
-    await http.del(`${EP.dispatch}/${id}`);
+    await http.del(`/dispatch/${id}`);
     return { ok: true };
   },
 
@@ -274,11 +273,11 @@ export const api = {
   },
   updateInventory: async (id, body) => {
     const realId = body._id || id;
-    const res = await http.put(`${EP.inventory}/${realId}`, body);
+    const res = await http.put(`/inventory/${realId}`, body);
     return res?.data || res;
   },
   deleteInventory: async (id) => {
-    await http.del(`${EP.inventory}/${id}`);
+    await http.del(`/inventory/${id}`);
     return { ok: true };
   },
 
@@ -300,11 +299,11 @@ export const api = {
     const realId = body._id || id;
     const payload = { ...body };
     if (body.tempRequired) { payload.temp_required = body.tempRequired; delete payload.tempRequired; }
-    const res = await http.put(`${EP.produce}/${realId}`, payload);
+    const res = await http.put(`/produce/${realId}`, payload);
     return res?.data || res;
   },
   deleteProduce: async (id) => {
-    await http.del(`${EP.produce}/${id}`);
+    await http.del(`/produce/${id}`);
     return { ok: true };
   },
 
