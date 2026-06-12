@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
+import sqlalchemy as sa
 import structlog
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,8 +15,30 @@ from app.config import settings
 from app.db.session import engine
 from app.models.base import Base
 from app.middleware.request_id import RequestIDMiddleware
+from app.middleware.audit_log import AuditLogMiddleware
 
 logger = structlog.get_logger(__name__)
+
+
+# ── Production device IDs (must match firmware DEVICE_ID constant) ────────────
+_PROD_ORG_ID    = "b9f1c2d3-e4a5-4b6c-7d8e-9f0a1b2c3d4e"
+_PROD_DEVICE_ID = "d1e2b3c4-a5b6-4c7d-8e9f-0a1b2c3d4e5f"  # matches firmware DEVICE_ID
+
+async def _seed_production_device(conn) -> None:
+    """Ensure SEPL Cold Storage org + ESP32 device exist so the firmware can ingest on first boot."""
+    await conn.execute(sa.text("""
+        INSERT INTO organizations (id, name, region, is_active)
+        VALUES (:id, 'SEPL Cold Storage', 'ap-south-1', true)
+        ON CONFLICT (id) DO NOTHING
+    """), {"id": _PROD_ORG_ID})
+
+    await conn.execute(sa.text("""
+        INSERT INTO devices (id, organization_id, name, status, thing_name, is_active)
+        VALUES (:id, :org_id, 'Smart Cold Box - 01', 'offline', 'esp32_sepl_01', true)
+        ON CONFLICT (id) DO NOTHING
+    """), {"id": _PROD_DEVICE_ID, "org_id": _PROD_ORG_ID})
+
+    logger.info("Production device seeded", device_id=_PROD_DEVICE_ID)
 
 
 def _json_safe_validation_errors(errors: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -41,13 +64,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             # Check connection
             await conn.execute(__import__("sqlalchemy").text("SELECT 1"))
             logger.info("Database connection verified")
-            
+
             # Ensure tables exist (Phase 2 fix)
             def run_create_all(connection):
                 Base.metadata.create_all(bind=connection)
-            
+
             await conn.run_sync(run_create_all)
             logger.info("Database tables verified/created")
+
+            # Seed production org + ESP32 device so firmware can ingest immediately
+            await _seed_production_device(conn)
 
     except Exception as exc:
         logger.error("Database initialization failed at startup (Container will stay alive for retries)", error=str(exc))
@@ -108,6 +134,9 @@ def create_application() -> FastAPI:
 
     # ── Request ID tracing ────────────────────────────────────────────────────
     application.add_middleware(RequestIDMiddleware)
+    
+    # ── Compliance Audit Logging ──────────────────────────────────────────────
+    application.add_middleware(AuditLogMiddleware)
 
     # ── Routes ────────────────────────────────────────────────────────────────
     application.include_router(api_router, prefix="/api/v1")

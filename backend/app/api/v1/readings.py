@@ -166,8 +166,18 @@ async def ingest_batch_sensor_data(
     
     db.add_all(readings)
     await db.commit()
-    
+
     return {"status": "success", "count": len(readings)}
+
+
+# Firmware-compatible alias — hardware uses /batch-ingest path
+@router.post("/batch-ingest", status_code=status.HTTP_201_CREATED, include_in_schema=False)
+async def ingest_batch_sensor_data_alias(
+    payload: BatchIngestPayload,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    return await ingest_batch_sensor_data(payload, request, db)
 
 
 @router.get("/{device_id}/raw", response_model=list[SensorReadingResponse])
