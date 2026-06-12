@@ -21,7 +21,11 @@ class DeviceCreate(DeviceBase):
     pass
 
 
-class DeviceUpdate(DeviceBase):
+class DeviceUpdate(BaseModel):
+    name: str | None = None
+    location_lat: float | None = None
+    location_lng: float | None = None
+    location_label: str | None = None
     is_active: bool | None = None
 
 
