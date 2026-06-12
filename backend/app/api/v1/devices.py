@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.rbac import Permission, require_permission
 from app.db.session import get_db
-from app.dependencies import get_current_org_id, get_current_user
+from app.dependencies import get_current_org_id
 from app.models.device import Device
 from app.models.user import User
 from app.schemas.device import DeviceCreate, DeviceResponse, DeviceUpdate
@@ -24,7 +24,9 @@ async def list_devices(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(require_permission(Permission.VIEW_DEVICES)),
 ) -> Sequence[Device]:
-    result = await db.execute(select(Device).where(Device.organization_id == org_id))
+    result = await db.execute(
+        select(Device).where(Device.organization_id == org_id, Device.is_active == True)
+    )
     return result.scalars().all()
 
 
@@ -109,6 +111,7 @@ async def delete_device(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(require_permission(Permission.MANAGE_ORGANISATIONS)),
 ) -> None:
+    # Soft delete — sensor_readings FK has no CASCADE, hard delete would fail
     device = await get_device(device_id, org_id, db, user)
-    await db.delete(device)
+    device.is_active = False
     await db.commit()
