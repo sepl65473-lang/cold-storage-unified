@@ -83,6 +83,7 @@ async def get_device_telemetry_alias(
 
 
 @router.patch("/{device_id}", response_model=DeviceResponse)
+@router.put("/{device_id}", response_model=DeviceResponse, include_in_schema=False)
 async def update_device(
     device_id: uuid.UUID,
     payload: DeviceUpdate,
@@ -99,3 +100,15 @@ async def update_device(
     await db.commit()
     await db.refresh(device)
     return device
+
+
+@router.delete("/{device_id}", status_code=204)
+async def delete_device(
+    device_id: uuid.UUID,
+    org_id: uuid.UUID = Depends(get_current_org_id),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_permission(Permission.MANAGE_ORGANISATIONS)),
+) -> None:
+    device = await get_device(device_id, org_id, db, user)
+    await db.delete(device)
+    await db.commit()

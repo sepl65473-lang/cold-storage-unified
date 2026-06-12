@@ -150,7 +150,11 @@ export const api = {
     return normDevice(res?.data || res);
   },
   updateDevice: async (id, body) => {
-    const res = await http.put(`/devices/${id}`, body);
+    const res = await http.patch(`/devices/${id}`, {
+      name: body.name,
+      location_label: body.chamber || body.location_label || "",
+      is_active: body.is_active,
+    });
     return normDevice(res?.data || res);
   },
   deleteDevice: async (id) => { await http.del(`/devices/${id}`); return { ok: true }; },
