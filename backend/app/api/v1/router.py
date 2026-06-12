@@ -49,3 +49,7 @@ api_router.include_router(roles_router, prefix="/roles", tags=["Roles"])
 @api_router.get("/health", tags=["Health"])
 async def health_check():
     return {"status": "ok"}
+
+@api_router.get("/version", tags=["Health"])
+async def version_check():
+    return {"version": "2.0.0", "features": ["gateways", "work-orders", "dispatch", "inventory", "produce", "notifications", "alert-rules", "audit", "roles"]}
