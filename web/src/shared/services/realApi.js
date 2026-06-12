@@ -147,10 +147,10 @@ export const api = {
     return normDevice(res?.data || res);
   },
   updateDevice: async (id, body) => {
-    const res = await http.put(`${EP.devices}/${id}`, body);
+    const res = await http.put(`/devices/${id}`, body);
     return normDevice(res?.data || res);
   },
-  deleteDevice: async (id) => { await http.del(`${EP.devices}/${id}`); return { ok: true }; },
+  deleteDevice: async (id) => { await http.del(`/devices/${id}`); return { ok: true }; },
 
   // ── Gateways ─────────────────────────────────────────────────────────────
   getGateways: async (params) => {
@@ -213,11 +213,11 @@ export const api = {
     return res?.data || res;
   },
   updateAlertRule: async (id, body) => {
-    const res = await http.put(`${EP.alertRules}/${id}`, body);
+    const res = await http.put(`/alert-rules/${id}`, body);
     return res?.data || res;
   },
   deleteAlertRule: async (id) => {
-    await http.del(`${EP.alertRules}/${id}`);
+    await http.del(`/alert-rules/${id}`);
     return { ok: true };
   },
 
@@ -353,10 +353,10 @@ export const api = {
     return normUser(res?.data || res);
   },
   updateUser: async (id, body) => {
-    const res = await http.put(`${EP.users}/${id}`, body);
+    const res = await http.put(`/admin/users/${id}`, body);
     return normUser(res?.data || res);
   },
-  deleteUser: async (id) => { await http.del(`${EP.users}/${id}`); return { ok: true }; },
+  deleteUser: async (id) => { await http.del(`/admin/users/${id}`); return { ok: true }; },
 
   // ── Roles ────────────────────────────────────────────────────────────────
   getRoles: async () => {
