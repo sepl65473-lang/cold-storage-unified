@@ -11,6 +11,8 @@ jobs:
     name: Docker Build & Push to ECR
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    outputs:
+      image: ${{ steps.build.outputs.image }}
     steps:
       - uses: actions/checkout@v4
       - name: Configure AWS credentials
@@ -18,11 +20,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Build & push Docker image
+        id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -33,6 +36,7 @@ jobs:
                        ./backend
           docker push $ECR_REGISTRY/cold-storage-backend:$IMAGE_TAG
           docker push $ECR_REGISTRY/cold-storage-backend:latest
+          echo "image=$ECR_REGISTRY/cold-storage-backend:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy:
     name: Deploy to ECS (Production)
@@ -47,11 +51,43 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Update ECS service
+          aws-region: us-east-1
+      - name: Register new ECS task definition & deploy
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
         run: |
+          # Get current task definition and replace image URI with new one
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition backend \
+            --query 'taskDefinition' \
+            --output json)
+
+          # Build new task definition JSON with updated image
+          NEW_TASK_DEF=$(echo "$TASK_DEF" | python3 -c "
+import json, sys
+td = json.load(sys.stdin)
+# Update the image in the first container definition
+td['containerDefinitions'][0]['image'] = '$IMAGE'
+# Remove fields that cannot be included when registering a new revision
+for key in ['taskDefinitionArn','revision','status','requiresAttributes',
+            'compatibilities','registeredAt','registeredBy','deregisteredAt']:
+    td.pop(key, None)
+print(json.dumps(td))
+")
+
+          # Register the new task definition revision
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "New task definition: $NEW_TASK_DEF_ARN"
+
+          # Update the service to use the new task definition revision
           aws ecs update-service \
             --cluster cold-storage-prod-cluster \
             --service backend \
-            --force-new-deployment \
-            --region ${{ secrets.AWS_REGION }}
+            --task-definition "$NEW_TASK_DEF_ARN" \
+            --force-new-deployment
+
+          echo "ECS service updated. New container deploying..."
