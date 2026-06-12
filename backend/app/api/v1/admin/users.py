@@ -10,9 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.rbac import Permission, require_permission
 from app.db.session import get_db
-from app.dependencies import get_current_org_id, get_current_user
+from app.dependencies import get_current_org_id
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
+from app.schemas.operations import UserUpdate
 
 router = APIRouter()
 
@@ -59,6 +60,25 @@ async def create_user(
     await db.refresh(new_user)
     return new_user
 
+
+
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: uuid.UUID,
+    payload: UserUpdate,
+    org_id: uuid.UUID = Depends(get_current_org_id),
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_permission(Permission.MANAGE_USERS)),
+) -> User:
+    result = await db.execute(select(User).where(User.id == user_id, User.organization_id == org_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    for k, v in payload.model_dump(exclude_unset=True).items():
+        setattr(user, k, v)
+    await db.commit()
+    await db.refresh(user)
+    return user
 
 
 @router.delete("/{user_id}")

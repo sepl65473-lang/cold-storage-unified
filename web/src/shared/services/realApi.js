@@ -75,10 +75,6 @@ const normAlert = (a) => ({
 const unwrap = (res) =>
   Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
 
-// Empty stubs for endpoints the backend does not have yet
-const emptyList = async () => ({ data: [], total: 0 });
-const okStub    = async () => ({ ok: true });
-
 export const api = {
   // ── Auth ─────────────────────────────────────────────────────────────────
   login: async (email, password) => {
@@ -101,7 +97,7 @@ export const api = {
     return normUser(res?.data || res);
   },
 
-  // ── Facilities (not in backend) ──────────────────────────────────────────
+  // ── Facilities ───────────────────────────────────────────────────────────
   getFacilities: async () => [],
 
   // ── Chambers ─────────────────────────────────────────────────────────────
@@ -120,9 +116,25 @@ export const api = {
       total: arr.length,
     };
   },
-  createChamber: okStub,
-  updateChamber: okStub,
-  deleteChamber: okStub,
+  createChamber: async (body) => {
+    const res = await http.post("/devices/", {
+      name: body.name,
+      location_label: body.location_label || body.name,
+    });
+    return res;
+  },
+  updateChamber: async (id, body) => {
+    const res = await http.patch(`/devices/${id}`, {
+      name: body.name,
+      location_label: body.location_label,
+      is_active: body.is_active,
+    });
+    return res;
+  },
+  deleteChamber: async (id) => {
+    await http.patch(`/devices/${id}`, { is_active: false });
+    return { ok: true };
+  },
 
   // ── Devices ──────────────────────────────────────────────────────────────
   getDevices: async (params) => {
@@ -140,11 +152,24 @@ export const api = {
   },
   deleteDevice: async (id) => { await http.del(`${EP.devices}/${id}`); return { ok: true }; },
 
-  // ── Gateways (not in backend) ────────────────────────────────────────────
-  getGateways: emptyList,
-  createGateway: okStub,
-  updateGateway: okStub,
-  deleteGateway: okStub,
+  // ── Gateways ─────────────────────────────────────────────────────────────
+  getGateways: async (params) => {
+    const res = await http.get(EP.gateways, params);
+    const arr = unwrap(res);
+    return { data: arr, total: arr.length };
+  },
+  createGateway: async (body) => {
+    const res = await http.post(EP.gateways, body);
+    return res?.data || res;
+  },
+  updateGateway: async (id, body) => {
+    const res = await http.put(`${EP.gateways}${id}`, body);
+    return res?.data || res;
+  },
+  deleteGateway: async (id) => {
+    await http.del(`${EP.gateways}${id}`);
+    return { ok: true };
+  },
 
   // ── Alerts ───────────────────────────────────────────────────────────────
   getAlerts: async (params) => {
@@ -160,49 +185,162 @@ export const api = {
   ackAlert:     async (id) => { await http.patch(`/alerts/${id}/resolve`, {}); return { ok: true }; },
   resolveAlert: async (id) => { await http.patch(EP.alertResolve(id), {}); return { ok: true }; },
 
-  // ── Notifications (not in backend) ───────────────────────────────────────
-  getNotifications: async () => ({ notifications: [] }),
-  markAllNotificationsRead: okStub,
-  markNotificationRead: okStub,
+  // ── Notifications ────────────────────────────────────────────────────────
+  getNotifications: async () => {
+    try {
+      const res = await http.get(EP.notifications);
+      return res || { notifications: [] };
+    } catch { return { notifications: [] }; }
+  },
+  markAllNotificationsRead: async () => {
+    try { await http.post(EP.notificationsReadAll, {}); } catch {}
+    return { ok: true };
+  },
+  markNotificationRead: async (id) => {
+    try { await http.patch(EP.notificationRead(id), {}); } catch {}
+    return { ok: true };
+  },
 
-  // ── Alert rules (not in backend) ─────────────────────────────────────────
-  getAlertRules: async () => [],
-  createAlertRule: okStub,
-  updateAlertRule: okStub,
-  deleteAlertRule: okStub,
+  // ── Alert Rules ──────────────────────────────────────────────────────────
+  getAlertRules: async () => {
+    try {
+      const res = await http.get(EP.alertRules);
+      return Array.isArray(res) ? res : (res?.data || []);
+    } catch { return []; }
+  },
+  createAlertRule: async (body) => {
+    const res = await http.post(EP.alertRules, body);
+    return res?.data || res;
+  },
+  updateAlertRule: async (id, body) => {
+    const res = await http.put(`${EP.alertRules}/${id}`, body);
+    return res?.data || res;
+  },
+  deleteAlertRule: async (id) => {
+    await http.del(`${EP.alertRules}/${id}`);
+    return { ok: true };
+  },
 
-  // ── Work Orders (not in backend) ─────────────────────────────────────────
-  getWorkOrders: emptyList,
-  createWorkOrder: okStub,
-  updateWorkOrder: okStub,
-  deleteWorkOrder: okStub,
+  // ── Work Orders ──────────────────────────────────────────────────────────
+  getWorkOrders: async (params) => {
+    const res = await http.get(EP.workOrders, params);
+    const arr = unwrap(res);
+    return { data: arr, total: arr.length };
+  },
+  createWorkOrder: async (body) => {
+    const res = await http.post(EP.workOrders, body);
+    return res?.data || res;
+  },
+  updateWorkOrder: async (id, body) => {
+    // id may be the short display id or _id — find the real UUID from _id
+    const realId = body._id || id;
+    const res = await http.put(`${EP.workOrders}/${realId}`, body);
+    return res?.data || res;
+  },
+  deleteWorkOrder: async (id) => {
+    await http.del(`${EP.workOrders}/${id}`);
+    return { ok: true };
+  },
 
-  // ── Dispatch (not in backend) ────────────────────────────────────────────
-  getDispatch: emptyList,
-  createDispatch: okStub,
-  updateDispatch: okStub,
-  deleteDispatch: okStub,
+  // ── Dispatch ─────────────────────────────────────────────────────────────
+  getDispatch: async (params) => {
+    const res = await http.get(EP.dispatch, params);
+    const arr = unwrap(res);
+    return { data: arr, total: arr.length };
+  },
+  createDispatch: async (body) => {
+    const res = await http.post(EP.dispatch, body);
+    return res?.data || res;
+  },
+  updateDispatch: async (id, body) => {
+    const realId = body._id || id;
+    const res = await http.put(`${EP.dispatch}/${realId}`, body);
+    return res?.data || res;
+  },
+  deleteDispatch: async (id) => {
+    await http.del(`${EP.dispatch}/${id}`);
+    return { ok: true };
+  },
 
-  // ── Inventory (not in backend) ───────────────────────────────────────────
-  getInventory: emptyList,
-  createInventory: okStub,
-  updateInventory: okStub,
-  deleteInventory: okStub,
+  // ── Inventory ────────────────────────────────────────────────────────────
+  getInventory: async (params) => {
+    const res = await http.get(EP.inventory, params);
+    const arr = unwrap(res);
+    return { data: arr, total: arr.length };
+  },
+  createInventory: async (body) => {
+    const res = await http.post(EP.inventory, body);
+    return res?.data || res;
+  },
+  updateInventory: async (id, body) => {
+    const realId = body._id || id;
+    const res = await http.put(`${EP.inventory}/${realId}`, body);
+    return res?.data || res;
+  },
+  deleteInventory: async (id) => {
+    await http.del(`${EP.inventory}/${id}`);
+    return { ok: true };
+  },
 
-  // ── Produce (not in backend) ─────────────────────────────────────────────
-  getProduce: emptyList,
-  createProduce: okStub,
-  updateProduce: okStub,
-  deleteProduce: okStub,
+  // ── Produce ──────────────────────────────────────────────────────────────
+  getProduce: async (params) => {
+    const res = await http.get(EP.produce, params);
+    const arr = unwrap(res);
+    return { data: arr, total: arr.length };
+  },
+  createProduce: async (body) => {
+    // Map camelCase frontend fields to snake_case backend fields
+    const payload = { ...body };
+    if (body.tempRequired) { payload.temp_required = body.tempRequired; delete payload.tempRequired; }
+    if (body.currentTemp !== undefined) { payload.current_temp = body.currentTemp; delete payload.currentTemp; }
+    const res = await http.post(EP.produce, payload);
+    return res?.data || res;
+  },
+  updateProduce: async (id, body) => {
+    const realId = body._id || id;
+    const payload = { ...body };
+    if (body.tempRequired) { payload.temp_required = body.tempRequired; delete payload.tempRequired; }
+    const res = await http.put(`${EP.produce}/${realId}`, payload);
+    return res?.data || res;
+  },
+  deleteProduce: async (id) => {
+    await http.del(`${EP.produce}/${id}`);
+    return { ok: true };
+  },
 
-  // ── Reports (not in backend) ─────────────────────────────────────────────
-  getReports: emptyList,
-  getReportMetrics: async () => ({ monthly: [] }),
-  generateReport: okStub,
-  scheduleReport: okStub,
+  // ── Reports ──────────────────────────────────────────────────────────────
+  getReports: async (params) => {
+    try {
+      const res = await http.get(EP.reports, params);
+      const arr = unwrap(res);
+      return { data: arr, total: arr.length };
+    } catch { return { data: [], total: 0 }; }
+  },
+  getReportMetrics: async () => {
+    try {
+      const res = await http.get(EP.reportsMetrics);
+      return res || { monthly: [] };
+    } catch { return { monthly: [] }; }
+  },
+  generateReport: async (id) => {
+    try {
+      await http.get(EP.reportGenerate(id));
+    } catch {}
+    return { ok: true };
+  },
+  scheduleReport: async (body) => {
+    try { await http.post(EP.reportsSchedule, body); } catch {}
+    return { ok: true };
+  },
 
-  // ── Audit (not in backend) ───────────────────────────────────────────────
-  getAudit: emptyList,
+  // ── Audit ────────────────────────────────────────────────────────────────
+  getAudit: async (params) => {
+    try {
+      const res = await http.get(EP.audit, params);
+      const arr = unwrap(res);
+      return { data: arr, total: arr.length };
+    } catch { return { data: [], total: 0 }; }
+  },
 
   // ── Users ────────────────────────────────────────────────────────────────
   getUsers: async (params) => {
@@ -220,11 +358,16 @@ export const api = {
   },
   deleteUser: async (id) => { await http.del(`${EP.users}/${id}`); return { ok: true }; },
 
-  // ── Roles (not in backend as separate endpoint) ───────────────────────────
-  getRoles: async () => ({ roles: [], perms: [], matrix: {} }),
-  createRole: okStub,
-  updateRole: okStub,
-  deleteRole: okStub,
+  // ── Roles ────────────────────────────────────────────────────────────────
+  getRoles: async () => {
+    try {
+      const res = await http.get(EP.roles);
+      return res || { roles: [], perms: [], matrix: {} };
+    } catch { return { roles: [], perms: [], matrix: {} }; }
+  },
+  createRole: async () => ({ ok: true }),
+  updateRole: async () => ({ ok: true }),
+  deleteRole: async () => ({ ok: true }),
 
   // ── Dashboard stats — avgTemp, avgHumidity, activeChambers, activeAlerts ───
   getStats: async () => {

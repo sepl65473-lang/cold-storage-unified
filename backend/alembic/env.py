@@ -19,14 +19,22 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.models.base import Base
-# Import all models to ensure they are registered with Base.metadata
-from app.models.user import User, Organization
-from app.models.device import Device
-from app.models.sensor_reading import SensorReading
-from app.models.alert import Alert
-from app.models.audit_log import AuditLog
-from app.models.command_audit import DeviceCommand
-from app.models.ota import FirmwareRelease, OTAUpdate
+# Side-effect imports — register all models with Base.metadata for autogenerate
+from app.models.user import User, Organization  # noqa: F401
+from app.models.device import Device  # noqa: F401
+from app.models.sensor_reading import SensorReading  # noqa: F401
+from app.models.alert import Alert  # noqa: F401
+from app.models.audit_log import AuditLog  # noqa: F401
+from app.models.command_audit import DeviceCommand  # noqa: F401
+from app.models.ota import FirmwareRelease, OTAUpdate  # noqa: F401
+from app.models.settings import OrganizationSettings  # noqa: F401
+from app.models.gateway import Gateway  # noqa: F401
+from app.models.work_order import WorkOrder  # noqa: F401
+from app.models.dispatch import Dispatch  # noqa: F401
+from app.models.inventory import Inventory  # noqa: F401
+from app.models.produce import Produce  # noqa: F401
+from app.models.notification import Notification  # noqa: F401
+from app.models.alert_rule import AlertRule  # noqa: F401
 
 target_metadata = Base.metadata
 
