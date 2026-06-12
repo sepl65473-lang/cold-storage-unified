@@ -143,7 +143,10 @@ export const api = {
     return { data: arr.map(normDevice), total: arr.length };
   },
   createDevice: async (body) => {
-    const res = await http.post(EP.devices, body);
+    const res = await http.post(EP.devices, {
+      name: body.name,
+      location_label: body.chamber || body.location_label || "",
+    });
     return normDevice(res?.data || res);
   },
   updateDevice: async (id, body) => {
