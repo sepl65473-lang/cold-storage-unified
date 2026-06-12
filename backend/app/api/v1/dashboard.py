@@ -1,7 +1,18 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+_IST_OFFSET = timedelta(hours=5, minutes=30)
+
+def _to_ist(utc_dt) -> str:
+    """Convert UTC datetime to IST HH:MM string."""
+    if utc_dt is None:
+        return "--:--"
+    if utc_dt.tzinfo is None:
+        utc_dt = utc_dt.replace(tzinfo=timezone.utc)
+    ist = utc_dt + _IST_OFFSET
+    return ist.strftime("%H:%M")
 from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, func
@@ -152,7 +163,7 @@ async def get_temperature_history(
     
     return [
         {
-            "time": r.time.strftime("%H:%M"),
+            "time": _to_ist(r.time),
             "temp": round(float(r.temperature), 1) if r.temperature is not None else None,
         }
         for r in readings
@@ -175,7 +186,7 @@ async def get_humidity_history(
     readings = result.scalars().all()
     return [
         {
-            "time": r.time.strftime("%H:%M"),
+            "time": _to_ist(r.time),
             "val": r.humidity
         }
         for r in readings
