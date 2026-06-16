@@ -67,7 +67,7 @@ export function LoginPage() {
         }}>
           <img
             src={heroBanner}
-            alt="SEPL ColdChain – See Everything, Control Anything"
+            alt="SEPL Cold Storage – See Everything, Control Anything"
             style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block" }}
           />
         </div>
@@ -90,7 +90,7 @@ export function LoginPage() {
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <img src={logo} alt="SEPL" className="h-11 w-11 rounded-lg object-contain ring-1 ring-slate-200" />
-            <div className="font-semibold tracking-tight text-slate-900">SEPL ColdChain</div>
+            <div className="font-semibold tracking-tight text-slate-900">SEPL Cold Storage</div>
           </div>
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">Sign in to your workspace</h2>
           <p className="mt-1 text-sm text-slate-500">Enter your operator credentials to continue.</p>
@@ -136,7 +136,7 @@ export function LoginPage() {
           <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-slate-400">
             <ShieldCheck className="h-3.5 w-3.5" /> Token auth · Role-based access · Encrypted transport
           </div>
-          <p className="mt-3 text-center text-xs text-slate-400">2026 SEPL ColdChain · v4.8.0</p>
+          <p className="mt-3 text-center text-xs text-slate-400">2026 SEPL Cold Storage · v4.8.0</p>
         </div>
       </div>
 

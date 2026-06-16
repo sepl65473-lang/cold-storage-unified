@@ -12,7 +12,7 @@ export function Sidebar({ collapsed }) {
     <aside className={cn("flex shrink-0 flex-col bg-slate-900 text-slate-300 transition-all", collapsed ? "w-16" : "w-60")}>
       <div className="flex h-14 items-center gap-2.5 border-b border-white/5 px-4">
         <div className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white"><img src={logo} alt="SEPL" className="h-6 w-6 rounded object-contain" /></div>
-        {!collapsed && <div className="leading-tight"><div className="text-sm font-semibold text-white">SEPL ColdChain</div><div className="text-[10px] uppercase tracking-wider text-slate-500">Operations</div></div>}
+        {!collapsed && <div className="leading-tight"><div className="text-sm font-semibold text-white">SEPL Cold Storage</div><div className="text-[10px] uppercase tracking-wider text-slate-500">Operations</div></div>}
       </div>
       <nav className="flex-1 overflow-y-auto px-2 py-3">
         {NAV.map((grp) => {
